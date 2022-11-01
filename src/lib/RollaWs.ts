@@ -1,5 +1,6 @@
-import WebSocket from 'ws';
 import _ from 'lodash';
+import WebSocket from 'ws';
+
 import { QuoteRequestDto } from './dto/quoteRequest.dto';
 import { getAuthenticationString } from './utils';
 export type JSONRPCID = string | number | null;
@@ -139,7 +140,7 @@ export class RollaWS {
 
       this.socket.on('message', this.parseIncomingMessage.bind(this));
       this.socket.on('close', this.handleClose.bind(this));
-      this.socket.on('open', (data) => {
+      this.socket.on('open', () => {
         this.logInfo('Websocket connection opened ');
         this.currentRetryCount = 0;
         clearInterval(this.retryIntervalInstance);
