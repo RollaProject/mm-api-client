@@ -16,12 +16,15 @@
   "globals": { "BigInt": true, "console": true, "WebAssembly": true },
   "rules": {
     "no-async-promise-executor": "off",
+    "eslint-comments/no-unused-disable": "off",
+    "eslint-comments/no-unlimited-disable": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "eslint-comments/disable-enable-pair": [
       "error",
       { "allowWholeFile": true }
     ],
-    "eslint-comments/no-unused-disable": "error",
     "import/order": [
       "error",
       { "newlines-between": "always", "alphabetize": { "order": "asc" } }
