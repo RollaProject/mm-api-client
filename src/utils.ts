@@ -37,7 +37,7 @@ export async function getAuthenticationString(
   options: { chainId: number; issuedAt?: string }
 ) {
   const wallet = new Wallet(privateKey);
-  const address = wallet.address
+  const address = wallet.address;
   const message = generateMessage({ address, ...options });
 
   const signature = await wallet.signMessage(message);
