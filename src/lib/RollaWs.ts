@@ -51,7 +51,7 @@ export interface IRollaWSOptions {
   /**
    * Websocket connection URL
    */
-  wsUrl?: string;
+  basePath?: string;
   /**
    * If specified it will try to reconnect `retryCount` times at an interval of `retryInterval` ms.
    */
@@ -92,10 +92,15 @@ export class RollaWS {
    */
   private currentRetryCount = 0;
 
+  private readonly wsUrl: string;
+
   /**
    * @param options Websocket connection options
    */
-  constructor(private options: IRollaWSOptions) {}
+  constructor(private options: IRollaWSOptions) {
+    this.wsUrl =
+      options.basePath || rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
+  }
 
   /**
    * Opens a new websocket connection to the yield api
@@ -103,10 +108,9 @@ export class RollaWS {
    */
   async open() {
     return new Promise(async (res) => {
-      const { wsUrl, authorization } = this.options;
-      this.logInfo('Opening websocket connection to ', wsUrl);
-      const url = wsUrl || rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
-      this.socket = new WebSocket(url, {
+      const { authorization } = this.options;
+      this.logInfo('Opening websocket connection to ', this.wsUrl);
+      this.socket = new WebSocket(this.wsUrl, {
         headers: {
           Authorization: await getAuthenticationString(
             authorization.privateKey,
@@ -240,7 +244,7 @@ export class RollaWS {
    */
   private logInfo(...message: any[]) {
     if (this.options.debugMode)
-      console.log(`[ROLLA ${this.options.wsUrl}] `, new Date(), ...message);
+      console.log(`[ROLLA ${this.wsUrl}] `, new Date(), ...message);
   }
 
   /**
