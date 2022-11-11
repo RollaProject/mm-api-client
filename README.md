@@ -17,7 +17,7 @@ npm install @rolla-finance/api-client
 ## Api client usage
 
 Some of the calls that the client makes require authentication using [Sign-In with Ethereum](https://eips.ethereum.org/EIPS/eip-4361).
-For that reason we require that you provide an instance of [`ethers.Wallet`](https://docs.ethers.io/v4/api-wallet.html) that we use to generate the authentication string, or provide a function that returns the authentication string.
+For that reason we require that you provide private key and chain id that we use to generate the authentication string, or provide a function that returns the authentication string.
 
 The client uses Axios for http requests. You can pass in an existing Axios instance as well as other axios options in the second constructor argument.
 
@@ -26,15 +26,15 @@ Basic api client usage is as follows:
 ```typescript
 import { RollaApiClient } from '@rolla-finance/api-client';
 
-const apiClient = new RollaApiClient(() =>
-    someFunctionToGetAuthenticationString(),
-);
-// or construct with a ethers.Wallet instance
-const wallet = new ethers.Wallet('private_key');
-const apiClient2 = new RollaApiClient({
-    wallet,
-    signingConfig: { chainId: 97 },
+const client = new RollaApiClient({
+  privateKey: 'private_key',
+  chainId: 96,
 });
+
+// or construct with a function that returnd the authentication string
+const apiClient = new RollaApiClient(() =>
+  someFunctionToGetAuthenticationString(),
+);
 
 const assetsResponse = await client.getAllAssets();
 await client.getMarketMakerActiveQuotes({
