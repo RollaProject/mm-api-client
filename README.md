@@ -31,7 +31,7 @@ const client = new RollaApiClient({
   chainId: 96,
 });
 
-// or construct with a function that returnd the authentication string
+// or construct with a function that returns the authentication string
 const apiClient = new RollaApiClient(() =>
   someFunctionToGetAuthenticationString(),
 );
