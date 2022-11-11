@@ -1,8 +1,13 @@
 import _ from 'lodash';
 import WebSocket from 'ws';
 
-import { QuoteRequestDto } from './dto/quoteRequest.dto';
-import { getAuthenticationString } from './utils';
+import { QuoteRequestDto } from '../restApi';
+import rollaApiConfig from '../rollaApi.config.json';
+import {
+  getAuthenticationString,
+  IAuthentication,
+  YIELD_ENDPOINT,
+} from '../utils';
 export type JSONRPCID = string | number | null;
 export type JSONRPCParams = Record<string, unknown> | unknown[];
 
@@ -38,24 +43,15 @@ const jsonRpcCommands = {
   }),
 };
 
-interface IRollaWSOptions {
-  /**
-   * Websocket connection URL
-   */
-  wsUrl: string;
+export interface IRollaWSOptions {
   /**
    * Authorization information
    */
-  authorization: {
-    /**
-     * Your private key as a market maker
-     */
-    privateKey: string;
-    /**
-     * Chain id
-     */
-    chainId: number;
-  };
+  authorization: IAuthentication;
+  /**
+   * Websocket connection URL
+   */
+  basePath?: string;
   /**
    * If specified it will try to reconnect `retryCount` times at an interval of `retryInterval` ms.
    */
@@ -77,7 +73,7 @@ export class RollaWS {
   /**
    * Core WS connection used to communicate
    */
-  private socket: WebSocket;
+  private socket: WebSocket | undefined;
 
   /**
    * Mapping between channels and callbacks that should respond to new messages from a channel
@@ -89,17 +85,22 @@ export class RollaWS {
   /**
    * The setInterval instance of the retry count feature
    */
-  private retryIntervalInstance: ReturnType<typeof setInterval>;
+  private retryIntervalInstance: ReturnType<typeof setInterval> | undefined;
 
   /**
    * Global retry count counter, this needs to be reset whenever we clearInterval(retryIntervalCounter)
    */
   private currentRetryCount = 0;
 
+  private readonly wsUrl: string;
+
   /**
    * @param options Websocket connection options
    */
-  constructor(private options: IRollaWSOptions) {}
+  constructor(private options: IRollaWSOptions) {
+    this.wsUrl =
+      options.basePath || rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
+  }
 
   /**
    * Opens a new websocket connection to the yield api
@@ -107,9 +108,9 @@ export class RollaWS {
    */
   async open() {
     return new Promise(async (res) => {
-      const { wsUrl, authorization } = this.options;
-      this.logInfo('Opening websocket connection to ', wsUrl);
-      this.socket = new WebSocket(wsUrl, {
+      const { authorization } = this.options;
+      this.logInfo('Opening websocket connection to ', this.wsUrl);
+      this.socket = new WebSocket(this.wsUrl, {
         headers: {
           Authorization: await getAuthenticationString(
             authorization.privateKey,
@@ -135,6 +136,7 @@ export class RollaWS {
 
       // Recommended: receive error events (e.g. first reconnection failed)
       this.socket.on('error', (data) => {
+        // @ts-ignore
         this.logInfo('ws saw error ', data?.wsKey);
       });
 
@@ -148,16 +150,14 @@ export class RollaWS {
 
         const oldChannelListeners = _.cloneDeep(this.channelListeners);
         this.channelListeners = {};
-        for (const channel in oldChannelListeners) {
-          for (const callback of oldChannelListeners[channel]) {
-            this.subscribeToChannel(
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              channel,
-              callback
-            );
+
+        Object.entries(oldChannelListeners).forEach(
+          ([channel, channelListeners]) => {
+            for (const callback of channelListeners) {
+              this.subscribeToChannel(channel as SocketChannels, callback);
+            }
           }
-        }
+        );
         res(null);
       });
     });
@@ -167,7 +167,7 @@ export class RollaWS {
    * Close the socket connection
    */
   async close() {
-    this.socket.close();
+    this.socket?.close();
   }
 
   /**
@@ -218,16 +218,21 @@ export class RollaWS {
    * @param data
    * @returns
    */
-  private async parseIncomingMessage(data) {
+  private async parseIncomingMessage(data: any) {
     const parsedData = JSON.parse(data.toString());
     this.logInfo('new websocket message ', parsedData);
-    if (!parsedData.channel) {
+    const channel = parsedData?.channel;
+    if (!channel || typeof channel !== 'string') {
       this.logInfo('Message without channel', parsedData);
       return;
     }
     // get the callbacks associated with this channel
     const subscriptionCallbacksToExecute =
-      this.channelListeners[parsedData.channel];
+      this.channelListeners[channel as SocketChannels];
+    if (!subscriptionCallbacksToExecute) {
+      this.logInfo('no subscription callback', parsedData);
+      return;
+    }
     for (const subscriptionCallbackToExecute of subscriptionCallbacksToExecute) {
       await subscriptionCallbackToExecute(parsedData.result);
     }
@@ -239,7 +244,7 @@ export class RollaWS {
    */
   private logInfo(...message: any[]) {
     if (this.options.debugMode)
-      console.log(`[ROLLA ${this.options.wsUrl}] `, new Date(), ...message);
+      console.log(`[ROLLA ${this.wsUrl}] `, new Date(), ...message);
   }
 
   /**

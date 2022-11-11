@@ -1,5 +1,18 @@
 import { Wallet } from 'ethers';
 
+export interface IAuthentication {
+  /**
+   * Your private key as a market maker
+   */
+  privateKey: string;
+  /**
+   * Chain id
+   */
+  chainId: number;
+}
+
+export const YIELD_ENDPOINT = '/yield';
+
 const generateMessage = ({
   address,
   chainId,
@@ -24,7 +37,7 @@ export async function getAuthenticationString(
   options: { chainId: number; issuedAt?: string }
 ) {
   const wallet = new Wallet(privateKey);
-  const address = wallet.address.toString();
+  const address = wallet.address;
   const message = generateMessage({ address, ...options });
 
   const signature = await wallet.signMessage(message);

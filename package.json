@@ -1,59 +1,62 @@
 {
-  "name": "rolla-client",
-  "version": "1.0.0",
+  "name": "@rolla-finance/api-client",
+  "version": "0.1.0",
   "description": "Client library to interact with the Rolla ecosystem",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/voidberg1/rolla-client",
-  "license": "MIT",
+  "repository": "https://github.com/RollaProject/rolla-client",
+  "license": "BSL",
   "keywords": [],
   "scripts": {
-    "build": "run-p build:*",
+    "release": "npm run build && npx semantic-release",
+    "build": "npm run client:generate && run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
-    "test": "run-s build test:*",
+    "test": "run-s test:*",
     "test:lint": "eslint src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "nyc --silent jest",
+    "test:unit": "jest",
+    "test:ts": "tsc --noEmit",
     "check-cli": "run-s test diff-integration-tests check-integration-tests",
     "check-integration-tests": "run-s check-integration-test:*",
     "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
     "watch:build": "tsc -p tsconfig.json -w",
-    "watch:test": "nyc --silent jest --watch",
-    "cov": "run-s build test:unit cov:html cov:lcov && open-cli coverage/index.html",
-    "cov:html": "nyc report --reporter=html",
-    "cov:lcov": "nyc report --reporter=lcov",
-    "cov:send": "run-s cov:lcov && codecov",
-    "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
+    "watch:test": "jest --watch",
     "doc": "run-s doc:html && open-cli build/docs/index.html",
     "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && npm i",
-    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
+    "prepare-release": "run-s reset-hard test doc:html version doc:publish",
+    "client:generate": "./generateApiClient.sh"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=16"
   },
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
+    "@metamask/eth-sig-util": "^5.0.0",
     "ethers": "^5.7.2",
-    "jest": "^29.2.2",
     "lodash": "^4.17.21",
     "ws": "^8.10.0"
   },
+  "peerDependencies": {
+    "axios": "^0.26 || ^0.27 || ^1"
+  },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@semantic-release/git": "^10.0.1",
     "@types/jest": "^29.2.1",
     "@types/lodash": "^4.14.187",
+    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
-    "codecov": "^3.5.0",
+    "axios": "^1.1.3",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.8.0",
     "eslint-config-prettier": "^6.11.0",
@@ -61,36 +64,29 @@
     "eslint-plugin-functional": "^3.0.2",
     "eslint-plugin-import": "^2.22.0",
     "gh-pages": "^3.1.0",
+    "jest": "^29.2.2",
+    "msw": "^0.47.4",
     "npm-run-all": "^4.1.5",
-    "nyc": "^15.1.0",
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
+    "semantic-release": "^19.0.5",
     "standard-version": "^9.0.0",
-    "ts-node": "^9.0.0",
-    "typedoc": "^0.19.0",
-    "typescript": "^4.0.2"
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.23.20",
+    "typescript": "^4.8.4"
   },
   "files": [
     "build/main",
     "build/module",
     "!**/*.spec.*",
-    "!**/*.json",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"
   ],
-  "ava": {
-    "failFast": true,
-    "timeout": "60s",
-    "typescript": {
-      "rewritePaths": {
-        "src/": "build/main/"
-      }
-    },
-    "files": [
-      "!build/module/**"
-    ]
-  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
@@ -98,11 +94,5 @@
   },
   "prettier": {
     "singleQuote": true
-  },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "exclude": [
-      "**/*.spec.js"
-    ]
   }
 }
