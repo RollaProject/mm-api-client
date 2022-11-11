@@ -34,9 +34,6 @@
     "doc:html": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
-    "version": "standard-version",
-    "reset-hard": "git clean -dfx && git reset --hard && npm i",
-    "prepare-release": "run-s reset-hard test doc:html version doc:publish",
     "client:generate": "./generateApiClient.sh"
   },
   "engines": {
@@ -74,7 +71,6 @@
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
     "semantic-release": "^19.0.5",
-    "standard-version": "^9.0.0",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.20",
