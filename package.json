@@ -8,6 +8,10 @@
   "repository": "https://github.com/RollaProject/rolla-client",
   "license": "BSL",
   "keywords": [],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "scripts": {
     "release": "npm run build && npx semantic-release",
     "build": "npm run client:generate && run-p build:*",
