@@ -1,4 +1,4 @@
-# Rolla client
+# Rolla marker maker client
 
 This package contains
 
@@ -11,7 +11,7 @@ The REST client is generated from the OpenAPI specification, is type-safe and ea
 ## Installation
 
 ```bash
-npm install @rolla-finance/api-client
+npm install @rolla-finance/mm-api-client
 ```
 
 ## Api client usage
@@ -24,7 +24,7 @@ The client uses Axios for http requests. You can pass in an existing Axios insta
 Basic api client usage is as follows:
 
 ```typescript
-import { RollaApiClient } from '@rolla-finance/api-client';
+import { RollaApiClient } from '@rolla-finance/mm-api-client';
 
 const client = new RollaApiClient({
   privateKey: 'private_key',
@@ -47,7 +47,7 @@ await client.getMarketMakerActiveQuotes({
 ## Signing utilities usage
 
 ```typescript
-import { signOrder, validateOrderSignature } from '@rolla-finance/api-client';
+import { signOrder, validateOrderSignature } from '@rolla-finance/mm-api-client';
 import { Wallet } from "ethers";
 
 async function run() {
@@ -100,7 +100,7 @@ run();
 
 ## WebSocket client usage
 
-// TODO
+// TODO docs
 
 ## License
 
