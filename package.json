@@ -9,6 +9,7 @@
   "license": "BSL",
   "keywords": [],
   "scripts": {
+    "release": "npm run build && npx semantic-release",
     "build": "npm run client:generate && run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
