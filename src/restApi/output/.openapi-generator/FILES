@@ -32,6 +32,7 @@ interfaces/option-dto.ts
 interfaces/option-market-maker-controller-get-price-registry-events400-response.ts
 interfaces/oracle-prices-dto.ts
 interfaces/order-tracking-dto.ts
+interfaces/post-meta-transaction-response-dto.ts
 interfaces/price-stored-dto.ts
 interfaces/prices-dto.ts
 interfaces/quote-dto-option-attributes.ts

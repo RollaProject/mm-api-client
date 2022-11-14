@@ -599,7 +599,7 @@
                   },
                   "1024000019": {
                     "value": {
-                      "errorMessage": "Order expiration timestamp must be less than 600 seconds in the future",
+                      "errorMessage": "Order expiration timestamp must be less than 660 seconds in the future",
                       "errorCode": "1024000019"
                     }
                   },
@@ -1091,20 +1091,8 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/String" }
-                },
-                "examples": {
-                  "response": {
-                    "value": [
-                      [
-                        "SUCCESS",
-                        "META_TRANSACTION_DOESNT_EXIST",
-                        "INCORRECT_MAKER",
-                        "ALREADY_RESPONDED_TO_TRANSACTION",
-                        "OTHER_FAILURE",
-                        "RESPONSE_WINDOW_EXPIRED"
-                      ]
-                    ]
+                  "items": {
+                    "$ref": "#/components/schemas/PostMetaTransactionResponseDto"
                   }
                 }
               }
@@ -1260,7 +1248,7 @@
     { "name": "summary", "description": "Summary Management" },
     { "name": "trades", "description": "Trades Management" }
   ],
-  "servers": [{ "url": "/yield" }],
+  "servers": [],
   "components": {
     "securitySchemes": {
       "custom": { "type": "apiKey", "in": "header", "name": "Authorization" },
@@ -2347,7 +2335,6 @@
         },
         "required": ["transactionHash", "marketMakerAction"]
       },
-      "String": { "type": "object", "properties": {} },
       "LastLookResponseWithOrderSignatureDto": {
         "type": "object",
         "properties": {
@@ -2368,6 +2355,25 @@
           }
         },
         "required": ["transactionHash", "marketMakerAction", "orderSignature"]
+      },
+      "PostMetaTransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "orderSignature": { "type": "string" },
+          "status": {
+            "type": "string",
+            "description": "responses to meta transaction requests",
+            "enum": [
+              "SUCCESS",
+              "META_TRANSACTION_DOESNT_EXIST",
+              "INCORRECT_MAKER",
+              "ALREADY_RESPONDED_TO_TRANSACTION",
+              "OTHER_FAILURE",
+              "RESPONSE_WINDOW_EXPIRED"
+            ]
+          }
+        },
+        "required": ["orderSignature", "status"]
       },
       "StatsDto": {
         "type": "object",

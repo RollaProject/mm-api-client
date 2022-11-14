@@ -711,7 +711,7 @@
                   },
                   "1024000019": {
                     "value": {
-                      "errorMessage": "Order expiration timestamp must be less than 600 seconds in the future",
+                      "errorMessage": "Order expiration timestamp must be less than 660 seconds in the future",
                       "errorCode": "1024000019"
                     }
                   },
@@ -1316,21 +1316,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/String"
-                  }
-                },
-                "examples": {
-                  "response": {
-                    "value": [
-                      [
-                        "SUCCESS",
-                        "META_TRANSACTION_DOESNT_EXIST",
-                        "INCORRECT_MAKER",
-                        "ALREADY_RESPONDED_TO_TRANSACTION",
-                        "OTHER_FAILURE",
-                        "RESPONSE_WINDOW_EXPIRED"
-                      ]
-                    ]
+                    "$ref": "#/components/schemas/PostMetaTransactionResponseDto"
                   }
                 }
               }
@@ -1513,11 +1499,7 @@
     "version": "1.0",
     "contact": {}
   },
-  "servers": [
-    {
-      "url": "/yield"
-    }
-  ],
+  "servers": [],
   "components": {
     "securitySchemes": {
       "custom": {
@@ -2795,10 +2777,6 @@
           "marketMakerAction"
         ]
       },
-      "String": {
-        "type": "object",
-        "properties": {}
-      },
       "LastLookResponseWithOrderSignatureDto": {
         "type": "object",
         "properties": {
@@ -2822,6 +2800,30 @@
           "transactionHash",
           "marketMakerAction",
           "orderSignature"
+        ]
+      },
+      "PostMetaTransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "orderSignature": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "responses to meta transaction requests",
+            "enum": [
+              "SUCCESS",
+              "META_TRANSACTION_DOESNT_EXIST",
+              "INCORRECT_MAKER",
+              "ALREADY_RESPONDED_TO_TRANSACTION",
+              "OTHER_FAILURE",
+              "RESPONSE_WINDOW_EXPIRED"
+            ]
+          }
+        },
+        "required": [
+          "orderSignature",
+          "status"
         ]
       },
       "StatsDto": {

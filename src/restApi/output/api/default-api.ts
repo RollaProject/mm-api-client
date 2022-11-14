@@ -45,6 +45,8 @@ import { OptionMarketMakerControllerGetPriceRegistryEvents400Response } from '..
 // @ts-ignore
 import { OraclePricesDto } from '../interfaces';
 // @ts-ignore
+import { PostMetaTransactionResponseDto } from '../interfaces';
+// @ts-ignore
 import { PriceStoredDto } from '../interfaces';
 // @ts-ignore
 import { QuoteDto } from '../interfaces';
@@ -1447,7 +1449,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+        async postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PostMetaTransactionResponseDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1750,7 +1752,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: any): AxiosPromise<Array<object>> {
+        postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: any): AxiosPromise<Array<PostMetaTransactionResponseDto>> {
             return localVarFp.postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto, options).then((request) => request(axios, basePath));
         },
         /**

@@ -22,6 +22,7 @@ export * from './option-dto-option-attributes';
 export * from './option-market-maker-controller-get-price-registry-events400-response';
 export * from './oracle-prices-dto';
 export * from './order-tracking-dto';
+export * from './post-meta-transaction-response-dto';
 export * from './price-stored-dto';
 export * from './prices-dto';
 export * from './quote-dto';
