@@ -2216,7 +2216,23 @@
         "properties": {
           "validity": {
             "type": "string",
-            "description": "Quote response validity"
+            "description": "Quote response validity",
+            "enum": [
+              "VALID_QUOTE",
+              "MARKET_MAKER_SKIPPED",
+              "TIMEOUT",
+              "INVALID_QUOTE",
+              "INSUFFICIENT_BALANCE",
+              "INSUFFICIENT_ALLOWANCE",
+              "INVALID_CANCELLATION_TIMESTAMP",
+              "OTHER_FAILURE",
+              "INVALID_SIGNATURE",
+              "REQUEST_RESPONSE_MISMATCH",
+              "INVALID_MAKER",
+              "INVALID_MAKING_AMOUNT",
+              "NO_QUOTE_REQUEST_FOR_RESPONSE",
+              "DUPLICATED_QUOTE_RESPONSE"
+            ]
           },
           "quoteRequestId": {
             "type": "string",

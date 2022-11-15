@@ -1,5 +1,6 @@
 import {
   PostMetaTransactionResponseDtoStatusEnum,
+  QuoteResponseReplyDtoValidityEnum,
   RollaApiClient,
 } from '../index';
 
@@ -67,13 +68,13 @@ describe('RollaApiClient', () => {
         {
           result1: [
             {
-              validity: 'VALID_QUOTE',
+              validity: QuoteResponseReplyDtoValidityEnum.ValidQuote,
               quoteRequestId: '0x1',
             },
           ],
           result2: [
             {
-              validity: 'VALID_QUOTE',
+              validity: QuoteResponseReplyDtoValidityEnum.ValidQuote,
               quoteRequestId: '0x2',
             },
           ],

@@ -25,7 +25,7 @@ export interface QuoteResponseReplyDto {
      * @type {string}
      * @memberof QuoteResponseReplyDto
      */
-    'validity': string;
+    'validity': QuoteResponseReplyDtoValidityEnum;
     /**
      * Associated quote request id
      * @type {string}
@@ -33,4 +33,24 @@ export interface QuoteResponseReplyDto {
      */
     'quoteRequestId': string;
 }
+
+export const QuoteResponseReplyDtoValidityEnum = {
+    ValidQuote: 'VALID_QUOTE',
+    MarketMakerSkipped: 'MARKET_MAKER_SKIPPED',
+    Timeout: 'TIMEOUT',
+    InvalidQuote: 'INVALID_QUOTE',
+    InsufficientBalance: 'INSUFFICIENT_BALANCE',
+    InsufficientAllowance: 'INSUFFICIENT_ALLOWANCE',
+    InvalidCancellationTimestamp: 'INVALID_CANCELLATION_TIMESTAMP',
+    OtherFailure: 'OTHER_FAILURE',
+    InvalidSignature: 'INVALID_SIGNATURE',
+    RequestResponseMismatch: 'REQUEST_RESPONSE_MISMATCH',
+    InvalidMaker: 'INVALID_MAKER',
+    InvalidMakingAmount: 'INVALID_MAKING_AMOUNT',
+    NoQuoteRequestForResponse: 'NO_QUOTE_REQUEST_FOR_RESPONSE',
+    DuplicatedQuoteResponse: 'DUPLICATED_QUOTE_RESPONSE'
+} as const;
+
+export type QuoteResponseReplyDtoValidityEnum = typeof QuoteResponseReplyDtoValidityEnum[keyof typeof QuoteResponseReplyDtoValidityEnum];
+
 
