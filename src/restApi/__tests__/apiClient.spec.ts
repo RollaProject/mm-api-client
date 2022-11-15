@@ -3,12 +3,16 @@ import {
   RollaApiClient,
 } from '../index';
 
+import {
+  postSuccessfulMetaTxResponses,
+  postSuccessfulQuoteResponses,
+} from './mocks/requests';
 import { server } from './mocks/server';
 
 describe('RollaApiClient', () => {
   const client = new RollaApiClient(() => 'SIWE test token');
 
-  beforeAll(() => server.listen());
+  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
@@ -40,55 +44,58 @@ describe('RollaApiClient', () => {
   });
 
   describe('batched endpoints', () => {
-    async function postSuccessfulMetaTxResponses() {
-      const [metaTxResponses, metaTxResponses2] = await Promise.all([
-        client.postMetaTransactionResponses({
-          lastLookResponseWithOrderSignatureDto: [
+    it.each([
+      [
+        postSuccessfulMetaTxResponses,
+        {
+          result1: [
             {
-              transactionHash: '0x',
               orderSignature: '0x1',
-              marketMakerAction: 'ACCEPTED',
+              status: PostMetaTransactionResponseDtoStatusEnum.Success,
             },
           ],
-        }),
-        client.postMetaTransactionResponses({
-          lastLookResponseWithOrderSignatureDto: [
+          result2: [
             {
-              transactionHash: '0x',
               orderSignature: '0x2',
-              marketMakerAction: 'ACCEPTED',
+              status: PostMetaTransactionResponseDtoStatusEnum.Success,
             },
           ],
-        }),
-      ]);
-      return { metaTxResponses, metaTxResponses2 };
-    }
-
-    it('postMetaTransactionResponses batches requests together', async () => {
-      const { metaTxResponses, metaTxResponses2 } =
-        await postSuccessfulMetaTxResponses();
-
-      // parts of the returned object are the same because the requests are batched together
-      // TODO should the parts that are the same be cloned so that they are not shared?
-      expect(metaTxResponses.headers).toBe(metaTxResponses2.headers);
-      expect(metaTxResponses.request).toBe(metaTxResponses2.request);
-      expect(metaTxResponses.data).not.toBe(metaTxResponses2.data);
-
-      expect(metaTxResponses.status).toBe(200);
-      expect(metaTxResponses.data).toStrictEqual([
-        {
-          orderSignature: '0x1',
-          status: PostMetaTransactionResponseDtoStatusEnum.Success,
         },
-      ]);
-      expect(metaTxResponses2.status).toBe(200);
-      expect(metaTxResponses2.data).toStrictEqual([
+      ],
+      [
+        postSuccessfulQuoteResponses,
         {
-          orderSignature: '0x2',
-          status: PostMetaTransactionResponseDtoStatusEnum.Success,
+          result1: [
+            {
+              validity: 'VALID_QUOTE',
+              quoteRequestId: '0x1',
+            },
+          ],
+          result2: [
+            {
+              validity: 'VALID_QUOTE',
+              quoteRequestId: '0x2',
+            },
+          ],
         },
-      ]);
-    });
+      ],
+    ])(
+      'postMetaTransactionResponses/postQuoteResponses batches requests together',
+      async (input, expected) => {
+        const [response1, response2] = await input(client);
+
+        // parts of the returned object are the same because the requests are batched together
+        // TODO should the parts that are the same be cloned so that they are not shared?
+        expect(response1.headers).toBe(response2.headers);
+        expect(response1.request).toBe(response2.request);
+        expect(response1.data).not.toBe(response2.data);
+
+        expect(response1.status).toBe(200);
+        expect(response1.data).toStrictEqual(expected.result1);
+        expect(response2.status).toBe(200);
+        expect(response2.data).toStrictEqual(expected.result2);
+      }
+    );
 
     it('failures: when first request fails, second (batched) also fails', async () => {
       const invalidAuthHeader = { Authorization: 'invalid' };
@@ -116,8 +123,8 @@ describe('RollaApiClient', () => {
       }
 
       // after that, the batching works again
-      const { metaTxResponses, metaTxResponses2 } =
-        await postSuccessfulMetaTxResponses();
+      const [metaTxResponses, metaTxResponses2] =
+        await postSuccessfulMetaTxResponses(client);
       expect(metaTxResponses.data).toStrictEqual([
         {
           orderSignature: '0x1',

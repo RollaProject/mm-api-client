@@ -39,6 +39,7 @@ interfaces/quote-dto-option-attributes.ts
 interfaces/quote-dto.ts
 interfaces/quote-meta-data-dto.ts
 interfaces/quote-request-dto.ts
+interfaces/quote-response-reply-dto.ts
 interfaces/quote-with-meta-data-dto-meta-data.ts
 interfaces/quote-with-meta-data-dto-quote.ts
 interfaces/quote-with-meta-data-dto.ts

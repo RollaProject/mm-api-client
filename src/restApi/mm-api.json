@@ -684,7 +684,12 @@
             "description": "None of the quote responses were successfully submitted",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "type": "boolean" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
+                  }
+                }
               }
             }
           },
@@ -692,7 +697,12 @@
             "description": "One or more quote responses were successfully submitted",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "type": "boolean" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
+                  }
+                }
               }
             }
           },
@@ -1876,6 +1886,21 @@
           "signature",
           "quoteRequestId"
         ]
+      },
+      "QuoteResponseReplyDto": {
+        "type": "object",
+        "properties": {
+          "validity": {
+            "type": "string",
+            "description": "Quote response validity"
+          },
+          "quoteRequestId": {
+            "type": "string",
+            "description": "Associated quote request id",
+            "example": "844e3987-931e-46d8-bc62-443804f17f3d"
+          }
+        },
+        "required": ["validity", "quoteRequestId"]
       },
       "ActiveOptionDto": {
         "type": "object",

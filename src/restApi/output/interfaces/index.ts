@@ -29,6 +29,7 @@ export * from './quote-dto';
 export * from './quote-dto-option-attributes';
 export * from './quote-meta-data-dto';
 export * from './quote-request-dto';
+export * from './quote-response-reply-dto';
 export * from './quote-with-meta-data-dto';
 export * from './quote-with-meta-data-dto-meta-data';
 export * from './quote-with-meta-data-dto-quote';

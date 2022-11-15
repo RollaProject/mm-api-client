@@ -812,7 +812,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "boolean"
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
                   }
                 }
               }
@@ -825,7 +825,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "boolean"
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
                   }
                 }
               }
@@ -2208,6 +2208,24 @@
           "allowedSender",
           "whitelist",
           "signature",
+          "quoteRequestId"
+        ]
+      },
+      "QuoteResponseReplyDto": {
+        "type": "object",
+        "properties": {
+          "validity": {
+            "type": "string",
+            "description": "Quote response validity"
+          },
+          "quoteRequestId": {
+            "type": "string",
+            "description": "Associated quote request id",
+            "example": "844e3987-931e-46d8-bc62-443804f17f3d"
+          }
+        },
+        "required": [
+          "validity",
           "quoteRequestId"
         ]
       },

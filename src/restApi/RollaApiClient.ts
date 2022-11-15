@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import rollaApiConfig from '../rollaApi.config.json';
 import {
@@ -12,13 +12,13 @@ import {
   ConfigurationParameters,
   DefaultApi,
   DefaultApiPostMetaTransactionResponsesRequest,
+  DefaultApiPostQuoteResponsesRequest,
   LastLookResponseWithOrderSignatureDto,
+  MarketMakerQuoteResponseDto,
   PostMetaTransactionResponseDto,
+  QuoteResponseReplyDto,
 } from './output';
-
-function filterUndefined<T>(value: T | undefined): value is T {
-  return value !== undefined;
-}
+import { RequestBatcher } from './output/RequestBatcher';
 
 export type Auth = IAuthentication | (() => Promise<string>) | (() => string);
 
@@ -30,20 +30,19 @@ export interface AxiosConfig {
 
 export class RollaApiClient extends DefaultApi {
   public readonly baseApiPath: string;
-  private req_pendingLastLookResponse: LastLookResponseWithOrderSignatureDto[] =
-    [];
-  private res_pendingLastLookResponse: Map<
-    string,
+  private readonly lastLookResponseBatcher: RequestBatcher<
+    LastLookResponseWithOrderSignatureDto,
     PostMetaTransactionResponseDto
-  > = new Map();
-
-  private pendingLastLookResponsePromise:
-    | Promise<AxiosResponse<PostMetaTransactionResponseDto[]>>
-    | undefined = undefined;
-
-  private readonly batchingDelay = 100;
-
-  constructor(protected auth: Auth, protected axiosConfig?: AxiosConfig) {
+  >;
+  private readonly quoteResponsesBatcher: RequestBatcher<
+    MarketMakerQuoteResponseDto,
+    QuoteResponseReplyDto
+  >;
+  constructor(
+    protected auth: Auth,
+    protected axiosConfig?: AxiosConfig,
+    protected readonly batchingDelay = 100
+  ) {
     const getAuthHeader =
       typeof auth === 'function'
         ? auth
@@ -61,75 +60,39 @@ export class RollaApiClient extends DefaultApi {
     });
     super(configuration, usedBasePath, axiosInstance);
     this.baseApiPath = usedBasePath;
+    this.lastLookResponseBatcher = new RequestBatcher(batchingDelay);
+    this.quoteResponsesBatcher = new RequestBatcher(batchingDelay);
   }
 
-  public async postMetaTransactionResponses(
+  public postQuoteResponses(
+    requestParameters: DefaultApiPostQuoteResponsesRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return this.quoteResponsesBatcher.makeBatchedRequest(
+      requestParameters.marketMakerQuoteResponseDto,
+      (params) =>
+        super.postQuoteResponses(
+          { marketMakerQuoteResponseDto: params },
+          options
+        ),
+      (params) => params.quoteRequestId,
+      (params) => params.quoteRequestId
+    );
+  }
+
+  public postMetaTransactionResponses(
     requestParameters: DefaultApiPostMetaTransactionResponsesRequest,
     options?: AxiosRequestConfig
   ) {
-    this.req_pendingLastLookResponse.push(
-      ...requestParameters.lastLookResponseWithOrderSignatureDto
+    return this.lastLookResponseBatcher.makeBatchedRequest(
+      requestParameters.lastLookResponseWithOrderSignatureDto,
+      (params) =>
+        super.postMetaTransactionResponses(
+          { lastLookResponseWithOrderSignatureDto: params },
+          options
+        ),
+      (params) => params.orderSignature,
+      (params) => params.orderSignature
     );
-    const orderSignaturesOfThisCall =
-      requestParameters.lastLookResponseWithOrderSignatureDto.map(
-        (it) => it.orderSignature
-      );
-
-    const remoteCallPromise = (async () => {
-      if (this.pendingLastLookResponsePromise) {
-        return this.pendingLastLookResponsePromise;
-      } else {
-        const resultPromise = new Promise<
-          AxiosResponse<PostMetaTransactionResponseDto[]>
-        >((resolve, reject) => {
-          setTimeout(async () => {
-            try {
-              const response = await this.batchedPostMetaTxResponses(options);
-              resolve(response);
-            } catch (err) {
-              reject(err);
-            }
-          }, this.batchingDelay);
-        });
-        this.pendingLastLookResponsePromise = resultPromise;
-        return resultPromise;
-      }
-    })();
-
-    try {
-      const response = await remoteCallPromise;
-      const responseShallowCopy = { ...response };
-
-      const correspondingResponses = orderSignaturesOfThisCall.map(
-        (signature) => {
-          return this.res_pendingLastLookResponse.get(signature);
-        }
-      );
-
-      responseShallowCopy.data = correspondingResponses.filter(filterUndefined);
-      return responseShallowCopy;
-    } finally {
-      orderSignaturesOfThisCall.forEach((signature) => {
-        this.res_pendingLastLookResponse.delete(signature);
-      });
-    }
-  }
-
-  private async batchedPostMetaTxResponses(options?: AxiosRequestConfig) {
-    const responses = this.req_pendingLastLookResponse.splice(
-      0,
-      this.req_pendingLastLookResponse.length
-    );
-    // this is needed otherwise subsequent requests will reuse previous response
-    this.pendingLastLookResponsePromise = undefined;
-
-    const response = await super.postMetaTransactionResponses(
-      { lastLookResponseWithOrderSignatureDto: responses },
-      options
-    );
-    response.data.forEach((it) =>
-      this.res_pendingLastLookResponse.set(it.orderSignature, it)
-    );
-    return response;
   }
 }

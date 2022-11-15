@@ -53,6 +53,8 @@ import { QuoteDto } from '../interfaces';
 // @ts-ignore
 import { QuoteRequestDto } from '../interfaces';
 // @ts-ignore
+import { QuoteResponseReplyDto } from '../interfaces';
+// @ts-ignore
 import { QuoteWithMetaDataDto } from '../interfaces';
 // @ts-ignore
 import { SetMakerActiveDto } from '../interfaces';
@@ -1460,7 +1462,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<boolean>>> {
+        async postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<QuoteResponseReplyDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.postQuoteResponses(marketMakerQuoteResponseDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1762,7 +1764,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: any): AxiosPromise<Array<boolean>> {
+        postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: any): AxiosPromise<Array<QuoteResponseReplyDto>> {
             return localVarFp.postQuoteResponses(marketMakerQuoteResponseDto, options).then((request) => request(axios, basePath));
         },
         /**
