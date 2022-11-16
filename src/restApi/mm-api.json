@@ -684,7 +684,12 @@
             "description": "None of the quote responses were successfully submitted",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "type": "boolean" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
+                  }
+                }
               }
             }
           },
@@ -692,7 +697,12 @@
             "description": "One or more quote responses were successfully submitted",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "type": "boolean" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteResponseReplyDto"
+                  }
+                }
               }
             }
           },
@@ -1091,20 +1101,8 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/String" }
-                },
-                "examples": {
-                  "response": {
-                    "value": [
-                      [
-                        "SUCCESS",
-                        "META_TRANSACTION_DOESNT_EXIST",
-                        "INCORRECT_MAKER",
-                        "ALREADY_RESPONDED_TO_TRANSACTION",
-                        "OTHER_FAILURE",
-                        "RESPONSE_WINDOW_EXPIRED"
-                      ]
-                    ]
+                  "items": {
+                    "$ref": "#/components/schemas/PostMetaTransactionResponseDto"
                   }
                 }
               }
@@ -1889,6 +1887,37 @@
           "quoteRequestId"
         ]
       },
+      "QuoteResponseReplyDto": {
+        "type": "object",
+        "properties": {
+          "validity": {
+            "type": "string",
+            "description": "Quote response validity",
+            "enum": [
+              "VALID_QUOTE",
+              "MARKET_MAKER_SKIPPED",
+              "TIMEOUT",
+              "INVALID_QUOTE",
+              "INSUFFICIENT_BALANCE",
+              "INSUFFICIENT_ALLOWANCE",
+              "INVALID_CANCELLATION_TIMESTAMP",
+              "OTHER_FAILURE",
+              "INVALID_SIGNATURE",
+              "REQUEST_RESPONSE_MISMATCH",
+              "INVALID_MAKER",
+              "INVALID_MAKING_AMOUNT",
+              "NO_QUOTE_REQUEST_FOR_RESPONSE",
+              "DUPLICATED_QUOTE_RESPONSE"
+            ]
+          },
+          "quoteRequestId": {
+            "type": "string",
+            "description": "Associated quote request id",
+            "example": "844e3987-931e-46d8-bc62-443804f17f3d"
+          }
+        },
+        "required": ["validity", "quoteRequestId"]
+      },
       "ActiveOptionDto": {
         "type": "object",
         "properties": {
@@ -2347,7 +2376,6 @@
         },
         "required": ["transactionHash", "marketMakerAction"]
       },
-      "String": { "type": "object", "properties": {} },
       "LastLookResponseWithOrderSignatureDto": {
         "type": "object",
         "properties": {
@@ -2368,6 +2396,25 @@
           }
         },
         "required": ["transactionHash", "marketMakerAction", "orderSignature"]
+      },
+      "PostMetaTransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "orderSignature": { "type": "string" },
+          "status": {
+            "type": "string",
+            "description": "responses to meta transaction requests",
+            "enum": [
+              "SUCCESS",
+              "META_TRANSACTION_DOESNT_EXIST",
+              "INCORRECT_MAKER",
+              "ALREADY_RESPONDED_TO_TRANSACTION",
+              "OTHER_FAILURE",
+              "RESPONSE_WINDOW_EXPIRED"
+            ]
+          }
+        },
+        "required": ["orderSignature", "status"]
       },
       "StatsDto": {
         "type": "object",

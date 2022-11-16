@@ -2,7 +2,14 @@ import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 
 import rollaApiRoot from '../../../rollaApi.config.json';
-import { AssetDto } from '../../output';
+import {
+  AssetDto,
+  LastLookResponseWithOrderSignatureDto,
+  MarketMakerQuoteResponseDto,
+  PostMetaTransactionResponseDto,
+  PostMetaTransactionResponseDtoStatusEnum,
+  QuoteResponseReplyDto,
+} from '../../output';
 
 // This configures a request mocking server with the given request handlers.
 export const server = setupServer(
@@ -69,6 +76,38 @@ export const server = setupServer(
         return res(ctx.status(401));
       }
       return res(ctx.status(200), ctx.json([]));
+    }
+  ),
+  rest.post(
+    rollaApiRoot.rollaApiRoot + '/yield/v1/metatransaction/responses',
+    async (req, res, ctx) => {
+      if (req.headers.get('Authorization') !== 'SIWE test token') {
+        return res(ctx.status(401));
+      }
+      const reqBody: LastLookResponseWithOrderSignatureDto[] = await req.json();
+      const body: PostMetaTransactionResponseDto[] = reqBody.map((item) => {
+        return {
+          orderSignature: item.orderSignature,
+          status: PostMetaTransactionResponseDtoStatusEnum.Success,
+        };
+      });
+      return res(ctx.status(200), ctx.json(body));
+    }
+  ),
+  rest.post(
+    rollaApiRoot.rollaApiRoot + '/yield/v1/quotes/responses',
+    async (req, res, ctx) => {
+      if (req.headers.get('Authorization') !== 'SIWE test token') {
+        return res(ctx.status(401));
+      }
+      const reqBody: MarketMakerQuoteResponseDto[] = await req.json();
+      const body: QuoteResponseReplyDto[] = reqBody.map((item) => {
+        return {
+          validity: 'VALID_QUOTE',
+          quoteRequestId: item.quoteRequestId,
+        };
+      });
+      return res(ctx.status(200), ctx.json(body));
     }
   )
 );

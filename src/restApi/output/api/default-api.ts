@@ -45,11 +45,15 @@ import { OptionMarketMakerControllerGetPriceRegistryEvents400Response } from '..
 // @ts-ignore
 import { OraclePricesDto } from '../interfaces';
 // @ts-ignore
+import { PostMetaTransactionResponseDto } from '../interfaces';
+// @ts-ignore
 import { PriceStoredDto } from '../interfaces';
 // @ts-ignore
 import { QuoteDto } from '../interfaces';
 // @ts-ignore
 import { QuoteRequestDto } from '../interfaces';
+// @ts-ignore
+import { QuoteResponseReplyDto } from '../interfaces';
 // @ts-ignore
 import { QuoteWithMetaDataDto } from '../interfaces';
 // @ts-ignore
@@ -1447,7 +1451,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+        async postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PostMetaTransactionResponseDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1458,7 +1462,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<boolean>>> {
+        async postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<QuoteResponseReplyDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.postQuoteResponses(marketMakerQuoteResponseDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1750,7 +1754,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: any): AxiosPromise<Array<object>> {
+        postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto: Array<LastLookResponseWithOrderSignatureDto>, options?: any): AxiosPromise<Array<PostMetaTransactionResponseDto>> {
             return localVarFp.postMetaTransactionResponses(lastLookResponseWithOrderSignatureDto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1760,7 +1764,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: any): AxiosPromise<Array<boolean>> {
+        postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: any): AxiosPromise<Array<QuoteResponseReplyDto>> {
             return localVarFp.postQuoteResponses(marketMakerQuoteResponseDto, options).then((request) => request(axios, basePath));
         },
         /**
