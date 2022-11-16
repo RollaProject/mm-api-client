@@ -599,7 +599,7 @@
                   },
                   "1024000019": {
                     "value": {
-                      "errorMessage": "Order expiration timestamp must be less than 660 seconds in the future",
+                      "errorMessage": "Order expiration timestamp must be less than 600 seconds in the future",
                       "errorCode": "1024000019"
                     }
                   },
@@ -1258,7 +1258,7 @@
     { "name": "summary", "description": "Summary Management" },
     { "name": "trades", "description": "Trades Management" }
   ],
-  "servers": [],
+  "servers": [{ "url": "/yield" }],
   "components": {
     "securitySchemes": {
       "custom": { "type": "apiKey", "in": "header", "name": "Authorization" },
