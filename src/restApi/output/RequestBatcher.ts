@@ -57,7 +57,7 @@ export class RequestBatcher<ReqParam , Res> {
 
     try {
       const response = await remoteCallPromise;
-      const responseShallowCopy = { ...response };
+      const responseShallowCopy: AxiosResponse<Res[]> = { ...response };
 
       const correspondingResponses = orderSignaturesOfThisCall.map(
         (signature) => {

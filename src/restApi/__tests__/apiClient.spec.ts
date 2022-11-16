@@ -86,9 +86,8 @@ describe('RollaApiClient', () => {
         const [response1, response2] = await input(client);
 
         // parts of the returned object are the same because the requests are batched together
-        // TODO should the parts that are the same be cloned so that they are not shared?
-        expect(response1.headers).toBe(response2.headers);
         expect(response1.request).toBe(response2.request);
+        expect(response1.headers).toBe(response2.headers);
         expect(response1.data).not.toBe(response2.data);
 
         expect(response1.status).toBe(200);
