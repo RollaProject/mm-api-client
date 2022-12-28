@@ -2,17 +2,8 @@ import _ from 'lodash';
 import WebSocket from 'ws';
 
 import { QuoteRequestDto } from '../restApi';
-import rollaApiConfig from '../rollaApi.config.json';
-import {
-  getAuthenticationString,
-  IAuthentication,
-  YIELD_ENDPOINT,
-} from '../utils';
 export type JSONRPCID = string | number | null;
 export type JSONRPCParams = Record<string, unknown> | unknown[];
-
-export const isJSONRPCID = (id: unknown): id is JSONRPCID =>
-  typeof id === 'string' || typeof id === 'number' || id === null;
 
 export type JSONRPCRequest = {
   jsonrpc: '2.0';
@@ -41,17 +32,27 @@ const jsonRpcCommands = {
       channels: [SocketChannels.META_TRANSACTIONS],
     },
   }),
-};
+} as const;
+
+interface WSEventHandlers {
+  onReply?: (data: any) => void;
+  onReconnecting?: (data: any) => void;
+  onReconnected?: (data: any) => void;
+  onError?: (data: any) => void;
+  onMessage?: (channelName: string, data: any) => void;
+  onClose?: () => void;
+  onOpen?: (retriesAttempted: number, channelsSubscribed: number) => void;
+}
 
 export interface IRollaWSOptions {
   /**
-   * Authorization information
-   */
-  authorization: IAuthentication;
-  /**
    * Websocket connection URL
    */
-  basePath?: string;
+  wsUrl: string;
+  /**
+   * Authorization information
+   */
+  authorization: string;
   /**
    * If specified it will try to reconnect `retryCount` times at an interval of `retryInterval` ms.
    */
@@ -64,7 +65,10 @@ export interface IRollaWSOptions {
    * If this should run in debug mode, additional logging will be emitted
    */
   debugMode?: boolean;
+  logger?: any;
+  eventHandlers?: WSEventHandlers;
 }
+
 /**
  * Library for managing websocket connections for Rolla.
  * Todo: a big task for this is to unit test it
@@ -73,7 +77,7 @@ export class RollaWS {
   /**
    * Core WS connection used to communicate
    */
-  private socket: WebSocket | undefined;
+  private socket?: WebSocket;
 
   /**
    * Mapping between channels and callbacks that should respond to new messages from a channel
@@ -85,22 +89,17 @@ export class RollaWS {
   /**
    * The setInterval instance of the retry count feature
    */
-  private retryIntervalInstance: ReturnType<typeof setInterval> | undefined;
+  private retryIntervalInstance?: ReturnType<typeof setInterval>;
 
   /**
    * Global retry count counter, this needs to be reset whenever we clearInterval(retryIntervalCounter)
    */
   private currentRetryCount = 0;
 
-  private readonly wsUrl: string;
-
   /**
    * @param options Websocket connection options
    */
-  constructor(private options: IRollaWSOptions) {
-    this.wsUrl =
-      options.basePath || rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
-  }
+  constructor(private options: IRollaWSOptions) {}
 
   /**
    * Opens a new websocket connection to the yield api
@@ -108,55 +107,67 @@ export class RollaWS {
    */
   async open() {
     return new Promise(async (res) => {
-      const { authorization } = this.options;
-      this.logInfo('Opening websocket connection to ', this.wsUrl);
-      this.socket = new WebSocket(this.wsUrl, {
+      const { wsUrl, authorization } = this.options;
+      this.logInfo('Opening websocket connection to ', wsUrl);
+
+      this.socket = new WebSocket(wsUrl, {
         headers: {
-          Authorization: await getAuthenticationString(
-            authorization.privateKey,
-            {
-              chainId: authorization.chainId,
-            }
-          ),
+          Authorization: authorization,
         },
       });
+
       this.socket.on('reply', (data) => {
         this.logInfo('log reply: ', JSON.stringify(data, null, 2));
+        this.options.eventHandlers?.onReply?.(data);
       });
 
       // receive notification when a ws connection is reconnecting automatically
       this.socket.on('reconnecting', (data) => {
         this.logInfo('ws automatically reconnecting.... ', data?.wsKey);
+        this.options.eventHandlers?.onReconnecting?.(data);
       });
 
       // receive notification that a reconnection completed successfully (e.g use REST to check for missing data)
       this.socket.on('reconnected', (data) => {
         this.logInfo('ws has reconnected ', data?.wsKey);
+        this.options.eventHandlers?.onReconnected?.(data);
       });
 
       // Recommended: receive error events (e.g. first reconnection failed)
       this.socket.on('error', (data) => {
-        // @ts-ignore
-        this.logInfo('ws saw error ', data?.wsKey);
+        this.logInfo('ws saw error ', data);
+        this.options.eventHandlers?.onError?.(data);
       });
 
       this.socket.on('message', this.parseIncomingMessage.bind(this));
+
       this.socket.on('close', this.handleClose.bind(this));
+
       this.socket.on('open', () => {
         this.logInfo('Websocket connection opened ');
+        const retriesAttempted = this.currentRetryCount;
         this.currentRetryCount = 0;
         clearInterval(this.retryIntervalInstance);
+
         // automatically resubscribe to the subscribed channels if there are any
-
         const oldChannelListeners = _.cloneDeep(this.channelListeners);
-        this.channelListeners = {};
 
-        Object.entries(oldChannelListeners).forEach(
-          ([channel, channelListeners]) => {
-            for (const callback of channelListeners) {
-              this.subscribeToChannel(channel as SocketChannels, callback);
-            }
+        this.channelListeners = {};
+        for (const channel in oldChannelListeners) {
+          // @ts-ignore
+          for (const callback of oldChannelListeners[channel]) {
+            this.subscribeToChannel(
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              channel,
+              callback
+            );
           }
+        }
+
+        this.options.eventHandlers?.onOpen?.(
+          retriesAttempted,
+          Object.keys(oldChannelListeners).length
         );
         res(null);
       });
@@ -221,18 +232,19 @@ export class RollaWS {
   private async parseIncomingMessage(data: any) {
     const parsedData = JSON.parse(data.toString());
     this.logInfo('new websocket message ', parsedData);
-    const channel = parsedData?.channel;
-    if (!channel || typeof channel !== 'string') {
+
+    if (!parsedData.channel) {
       this.logInfo('Message without channel', parsedData);
+      this.options.eventHandlers?.onMessage?.('NO_CHANNEL', data);
       return;
+    } else {
+      this.options.eventHandlers?.onMessage?.(parsedData.channel, data);
     }
+
     // get the callbacks associated with this channel
     const subscriptionCallbacksToExecute =
-      this.channelListeners[channel as SocketChannels];
-    if (!subscriptionCallbacksToExecute) {
-      this.logInfo('no subscription callback', parsedData);
-      return;
-    }
+      // @ts-ignore
+      this.channelListeners[parsedData.channel];
     for (const subscriptionCallbackToExecute of subscriptionCallbacksToExecute) {
       await subscriptionCallbackToExecute(parsedData.result);
     }
@@ -243,8 +255,15 @@ export class RollaWS {
    * @param message message to be logged
    */
   private logInfo(...message: any[]) {
-    if (this.options.debugMode)
-      console.log(`[ROLLA ${this.wsUrl}] `, new Date(), ...message);
+    if (this.options.debugMode) {
+      const logger = this.options.logger || console;
+      logger.log(
+        `[ROLLA ${this.options.wsUrl}] ` +
+          new Date() +
+          ' ' +
+          JSON.stringify(message)
+      );
+    }
   }
 
   /**
@@ -270,6 +289,10 @@ export class RollaWS {
     // this is important because handleClose is called also when a connection fails to establish
     // so we need to prevent the setInterval from being called again if we're in retry mode.
     if (this.currentRetryCount > 0) return;
+
+    // Add a metric if we are truly closing
+    this.options.eventHandlers?.onClose?.();
+
     this.logInfo('Websocket closed!');
     // there's a case where the user can manually call .close() and this callback will be triggered meaning that
     // even though it's purposefully close, it will still try to reconnect. It's out of the scope of the quote-provider
@@ -284,7 +307,7 @@ export class RollaWS {
       // @ts-ignore
       if (this.currentRetryCount < retryCount) {
         this.currentRetryCount++;
-        this.logInfo('Reconnecting ', this.currentRetryCount, ' times');
+        this.logInfo('Reconnecting ' + this.currentRetryCount + ' times');
         this.open();
       } else {
         this.currentRetryCount = 0;

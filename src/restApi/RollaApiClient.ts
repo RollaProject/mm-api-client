@@ -1,11 +1,8 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-import rollaApiConfig from '../rollaApi.config.json';
-import {
-  getAuthenticationString,
-  IAuthentication,
-  YIELD_ENDPOINT,
-} from '../utils';
+import { RollaWS } from '..';
+import { getAuthenticationString, IAuthentication } from '../utils';
+import { IRollaWSOptions } from '../wsApi/RollaWs';
 
 import {
   Configuration,
@@ -43,7 +40,7 @@ export class RollaApiClient extends DefaultApi {
     protected axiosConfig?: AxiosConfig,
     protected readonly batchingDelay = 100
   ) {
-    const getAuthHeader =
+    const authHeader =
       typeof auth === 'function'
         ? auth
         : () =>
@@ -51,17 +48,40 @@ export class RollaApiClient extends DefaultApi {
 
     const { axiosInstance, basePath, baseOptions } = axiosConfig || {};
 
-    const usedBasePath =
-      basePath ?? rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
+    const usedBasePath = 'http://localhost:3020';
+    // const usedBasePath =
+    //   basePath ?? rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
 
     const configuration = new Configuration({
       baseOptions,
-      apiKey: getAuthHeader,
+      apiKey: authHeader,
     });
     super(configuration, usedBasePath, axiosInstance);
     this.baseApiPath = usedBasePath;
     this.lastLookResponseBatcher = new RequestBatcher(batchingDelay);
     this.quoteResponsesBatcher = new RequestBatcher(batchingDelay);
+  }
+
+  public async initRollaWS(
+    options: Omit<IRollaWSOptions, 'authorization' | 'wsUrl'> = {}
+  ) {
+    const authHeader =
+      typeof this.auth === 'function'
+        ? await this.auth()
+        : await // @ts-ignore
+          getAuthenticationString(this.auth.privateKey, {
+            // @ts-ignore
+            chainId: this.auth.chainId,
+          });
+    const wsYieldApi = new URL(this.baseApiPath)
+      .toString()
+      .replace('http', 'ws');
+
+    return new RollaWS({
+      wsUrl: wsYieldApi,
+      authorization: authHeader,
+      ...options,
+    });
   }
 
   public postQuoteResponses(
