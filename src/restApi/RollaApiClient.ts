@@ -1,7 +1,12 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { RollaWS } from '..';
-import { getAuthenticationString, IAuthentication } from '../utils';
+import rollaApiConfig from '../rollaApi.config.json';
+import {
+  getAuthenticationString,
+  IAuthentication,
+  YIELD_ENDPOINT,
+} from '../utils';
 import { IRollaWSOptions } from '../wsApi/RollaWs';
 
 import {
@@ -48,9 +53,8 @@ export class RollaApiClient extends DefaultApi {
 
     const { axiosInstance, basePath, baseOptions } = axiosConfig || {};
 
-    const usedBasePath = 'http://localhost:3020';
-    // const usedBasePath =
-    //   basePath ?? rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
+    const usedBasePath =
+      basePath ?? rollaApiConfig.rollaApiRoot + YIELD_ENDPOINT;
 
     const configuration = new Configuration({
       baseOptions,
