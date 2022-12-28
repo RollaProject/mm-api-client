@@ -1,4 +1,4 @@
-export { RollaWS, type IRollaWSOptions } from './lib/RollaWs';
+export { RollaWS, type IRollaWSOptions } from './wsApi/RollaWs';
 export { signOrder, validateOrderSignature } from './signing/sign';
 export {
   RollaApiClient,
