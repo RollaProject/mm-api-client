@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActiveOptionDto } from './active-option-dto';
+import { AssetDto } from './asset-dto';
 // May contain unused imports in some cases
 // @ts-ignore
-import { AssetDto } from './asset-dto';
+import { OptionDto } from './option-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import { QuoteDto } from './quote-dto';
@@ -46,10 +46,10 @@ export interface SummaryDto {
     'assets': Array<AssetDto>;
     /**
      * Options summary
-     * @type {Array<ActiveOptionDto>}
+     * @type {Array<OptionDto>}
      * @memberof SummaryDto
      */
-    'options': Array<ActiveOptionDto>;
+    'options': Array<OptionDto>;
     /**
      * Quotes summary
      * @type {Array<QuoteDto>}

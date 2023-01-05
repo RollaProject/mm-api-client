@@ -21,6 +21,7 @@ import {
   QuoteResponseReplyDto,
 } from './output';
 import { RequestBatcher } from './output/RequestBatcher';
+import { SignatureDto } from './output/interfaces/signature-dto';
 
 export type Auth = IAuthentication | (() => Promise<string>) | (() => string);
 
@@ -115,8 +116,8 @@ export class RollaApiClient extends DefaultApi {
           { lastLookResponseWithOrderSignatureDto: params },
           options
         ),
-      (params) => params.orderSignature,
-      (params) => params.orderSignature
+      (params) => (params.orderSignature as SignatureDto).signatureData,
+      (params) => (params.orderSignature as SignatureDto).signatureData
     );
   }
 }

@@ -2,13 +2,22 @@ import {
   TypedDataDomain,
   TypedDataField,
 } from '@ethersproject/abstract-signer';
-import { BigNumberish } from 'ethers';
 
 export interface TypedData {
   types: Record<string, TypedDataField[]>;
   domain: TypedDataDomain;
   primaryType: string;
   message: object;
+}
+
+export enum SignatureType {
+  EIP712,
+  EIP1271,
+}
+
+export interface Signature {
+  signatureType: SignatureType;
+  signatureData: string;
 }
 
 export interface EIP712Domain {
@@ -21,9 +30,9 @@ export interface EIP712Domain {
 export interface OptionAttributes {
   underlyingAsset: string;
   oracle: string;
-  strikePrice: string;
   expiryTime: string;
   isCall: boolean;
+  strikePrice: string;
 }
 
 export interface Order {
@@ -37,21 +46,39 @@ export interface Order {
   makingAmount: string;
   takingAmount: string;
   whitelist: string;
+  orderTracking: OrderTracking;
+  takerIsSigner: boolean;
+}
+
+export interface MetaOrder {
+  functionType: number;
+  nonce: number;
+  deadline: string;
+  from: string;
+  order: Order;
+  signature: Signature;
+  permit: string;
 }
 
 export interface OrderWithSignature {
   order: Order;
-  signature: string;
+  signature: Signature;
+}
+
+export interface MetaOrderWithSignature {
+  metaOrder: MetaOrder;
+  metaTxnSignature: Signature;
 }
 
 export interface OrderTracking {
   integrator: string;
-  integratorPercentage: BigNumberish;
+  integratorPercentage: string;
   orderTag: string;
 }
 
-export interface OrderTracking {
-  integrator: string;
-  integratorPercentage: BigNumberish;
-  orderTag: string;
+export interface MetaTxnObject {
+  metaOrder: MetaOrder;
+  r: string;
+  s: string;
+  v: number;
 }

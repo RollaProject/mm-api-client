@@ -15,19 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { QuoteDtoOptionAttributes } from './quote-dto-option-attributes';
-// May contain unused imports in some cases
-// @ts-ignore
-import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
-// May contain unused imports in some cases
-// @ts-ignore
-import { UnsignedQuoteDto } from './unsigned-quote-dto';
+import { OrderTrackingDto } from './order-tracking-dto';
 
 /**
- * @type MetaTransactionDtoOrder
- * The order object
+ * @type QuoteDtoOrderTracking
+ * Order tracking object
  * @export
  */
-export type MetaTransactionDtoOrder = UnsignedQuoteDto;
+export type QuoteDtoOrderTracking = OrderTrackingDto;
 
 

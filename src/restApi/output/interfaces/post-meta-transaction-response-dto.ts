@@ -22,10 +22,10 @@
 export interface PostMetaTransactionResponseDto {
     /**
      * 
-     * @type {string}
+     * @type {object}
      * @memberof PostMetaTransactionResponseDto
      */
-    'orderSignature': string;
+    'orderSignature': object;
     /**
      * responses to meta transaction requests
      * @type {string}

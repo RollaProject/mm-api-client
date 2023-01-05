@@ -2,6 +2,7 @@ import {
   PostMetaTransactionResponseDtoStatusEnum,
   QuoteResponseReplyDtoValidityEnum,
   RollaApiClient,
+  SignatureType,
 } from '../index';
 
 import {
@@ -19,7 +20,9 @@ describe('RollaApiClient', () => {
 
   it('baseApiPath is present', () => {
     expect(client.baseApiPath).toBe(
-      'https://bsc-testnet-dev.rolla.finance/yield'
+      // change this back after merging the changes
+      // 'https://bsc-testnet-dev.rolla.finance/yield'
+      'http://localhost:3001/yield'
     );
   });
 
@@ -51,13 +54,21 @@ describe('RollaApiClient', () => {
         {
           result1: [
             {
-              orderSignature: '0x1',
+              orderSignature: {
+                signatureData:
+                  '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
+                signatureType: SignatureType.EIP712,
+              },
               status: PostMetaTransactionResponseDtoStatusEnum.Success,
             },
           ],
           result2: [
             {
-              orderSignature: '0x2',
+              orderSignature: {
+                signatureData:
+                  '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002',
+                signatureType: SignatureType.EIP712,
+              },
               status: PostMetaTransactionResponseDtoStatusEnum.Success,
             },
           ],
@@ -69,13 +80,15 @@ describe('RollaApiClient', () => {
           result1: [
             {
               validity: QuoteResponseReplyDtoValidityEnum.ValidQuote,
-              quoteRequestId: '0x1',
+              quoteRequestId:
+                '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
             },
           ],
           result2: [
             {
               validity: QuoteResponseReplyDtoValidityEnum.ValidQuote,
-              quoteRequestId: '0x2',
+              quoteRequestId:
+                '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002',
             },
           ],
         },
@@ -127,14 +140,22 @@ describe('RollaApiClient', () => {
         await postSuccessfulMetaTxResponses(client);
       expect(metaTxResponses.data).toStrictEqual([
         {
-          orderSignature: '0x1',
+          orderSignature: {
+            signatureData:
+              '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
+            signatureType: SignatureType.EIP712,
+          },
           status: PostMetaTransactionResponseDtoStatusEnum.Success,
         },
       ]);
       expect(metaTxResponses2.status).toBe(200);
       expect(metaTxResponses2.data).toStrictEqual([
         {
-          orderSignature: '0x2',
+          orderSignature: {
+            signatureData:
+              '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002',
+            signatureType: SignatureType.EIP712,
+          },
           status: PostMetaTransactionResponseDtoStatusEnum.Success,
         },
       ]);

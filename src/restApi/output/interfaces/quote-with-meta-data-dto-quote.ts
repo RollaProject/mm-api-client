@@ -19,6 +19,9 @@ import { QuoteDto } from './quote-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import { QuoteDtoOptionAttributes } from './quote-dto-option-attributes';
+// May contain unused imports in some cases
+// @ts-ignore
+import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
 
 /**
  * @type QuoteWithMetaDataDtoQuote

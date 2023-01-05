@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { QuoteDtoOptionAttributes } from './quote-dto-option-attributes';
+// May contain unused imports in some cases
+// @ts-ignore
+import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
 
 /**
  * 
@@ -54,6 +57,18 @@ export interface QuoteDto {
      */
     'makerAsset': string;
     /**
+     * Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.
+     * @type {boolean}
+     * @memberof QuoteDto
+     */
+    'takerIsSigner': boolean;
+    /**
+     * 
+     * @type {QuoteDtoOrderTracking}
+     * @memberof QuoteDto
+     */
+    'orderTracking': QuoteDtoOrderTracking;
+    /**
      * The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.
      * @type {string}
      * @memberof QuoteDto
@@ -85,9 +100,9 @@ export interface QuoteDto {
     'whitelist': string;
     /**
      * To generate a signature from an order, the EIP712 standard can be used along with a private key. This is verified by Rolla when you send us a quote response after we request one.
-     * @type {string}
+     * @type {object}
      * @memberof QuoteDto
      */
-    'signature': string;
+    'signature': object;
 }
 

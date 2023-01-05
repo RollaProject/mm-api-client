@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { QuoteDtoOptionAttributes } from './quote-dto-option-attributes';
+// May contain unused imports in some cases
+// @ts-ignore
+import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
 
 /**
  * 
@@ -53,6 +56,18 @@ export interface MarketMakerQuoteRequestDto {
      * @memberof MarketMakerQuoteRequestDto
      */
     'makerAsset': string;
+    /**
+     * Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.
+     * @type {boolean}
+     * @memberof MarketMakerQuoteRequestDto
+     */
+    'takerIsSigner': boolean;
+    /**
+     * 
+     * @type {QuoteDtoOrderTracking}
+     * @memberof MarketMakerQuoteRequestDto
+     */
+    'orderTracking': QuoteDtoOrderTracking;
     /**
      * The user who can submit the order to the chain. Zero address means anyone.
      * @type {string}

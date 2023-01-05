@@ -711,13 +711,13 @@
                   },
                   "1024000019": {
                     "value": {
-                      "errorMessage": "Order expiration timestamp must be less than 600 seconds in the future",
+                      "errorMessage": "Order expiration timestamp must be less than 660 seconds in the future",
                       "errorCode": "1024000019"
                     }
                   },
                   "1024000020": {
                     "value": {
-                      "errorMessage": "Only the ChainlinkFixedTimeOracle can be used as an oracle (0xc213317D5844479fD9deD11dbcd4d5A005FCC3a1)",
+                      "errorMessage": "Only the ChainlinkFixedTimeOracle can be used as an oracle (0x51f26459c2Df78c2E00a89CD6F880Cf93c80dA33)",
                       "errorCode": "1024000020"
                     }
                   },
@@ -733,6 +733,17 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/v1/quotes/getRandomQuote": {
+      "get": {
+        "operationId": "QuoteController_getRandomQuote",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
           }
         }
       }
@@ -912,6 +923,20 @@
             "basic": []
           }
         ]
+      },
+      "post": {
+        "operationId": "YieldConfigController_setInternalConfig",
+        "parameters": [],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ]
       }
     },
     "/v1/trades/market-maker": {
@@ -1058,14 +1083,6 @@
         "summary": "Retrieves a list of a user's trades",
         "parameters": [
           {
-            "name": "userAddress",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "includeTradeTypes",
             "required": false,
             "in": "query",
@@ -1119,6 +1136,12 @@
             "schema": {
               "type": "number"
             }
+          },
+          {
+            "name": "userAddress",
+            "required": true,
+            "in": "query",
+            "schema": {}
           }
         ],
         "responses": {
@@ -1499,11 +1522,7 @@
     "version": "1.0",
     "contact": {}
   },
-  "servers": [
-    {
-      "url": "/yield"
-    }
-  ],
+  "servers": [],
   "components": {
     "securitySchemes": {
       "custom": {
@@ -1934,6 +1953,31 @@
           "optionAddress"
         ]
       },
+      "OrderTrackingDto": {
+        "type": "object",
+        "properties": {
+          "integrator": {
+            "type": "string",
+            "description": "Integrator Address",
+            "example": "0x974d7b7A72AE7BF1Ee2D7BdfA60FD51f1fc7702d"
+          },
+          "integratorPercentage": {
+            "type": "string",
+            "description": "Integrator commission percentage which will be sent to the integrator for referring the transaction",
+            "example": "500"
+          },
+          "orderTag": {
+            "type": "string",
+            "description": "An optional tracking parameter for applications",
+            "example": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        "required": [
+          "integrator",
+          "integratorPercentage",
+          "orderTag"
+        ]
+      },
       "QuoteDto": {
         "type": "object",
         "properties": {
@@ -1965,6 +2009,19 @@
             "description": "The address of the asset that the option is being purchased with",
             "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
           },
+          "takerIsSigner": {
+            "type": "boolean",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
+            "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
+          },
           "orderCreationTimestamp": {
             "type": "string",
             "description": "The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.",
@@ -1991,7 +2048,7 @@
             "example": "0x0000000000000000000000000000000000000000"
           },
           "signature": {
-            "type": "string",
+            "type": "object",
             "description": "To generate a signature from an order, the EIP712 standard can be used along with a private key. This is verified by Rolla when you send us a quote response after we request one.",
             "example": "0xba66d503dc4947f1a7d5e7d532f8e366b3e8db452607ea55a0c44d5b85097d9d03b1a12ee9b1347fad1968eefdae2977b8d82c7bf6e35ea871f5d0440ba88efa1c"
           }
@@ -2002,6 +2059,8 @@
           "takingAmount",
           "optionAttributes",
           "makerAsset",
+          "takerIsSigner",
+          "orderTracking",
           "orderCreationTimestamp",
           "maker",
           "makingAmount",
@@ -2065,6 +2124,19 @@
             "type": "string",
             "description": "The address of the asset that the option is being purchased with",
             "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
+          },
+          "takerIsSigner": {
+            "type": "boolean",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
+            "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
           }
         },
         "required": [
@@ -2072,7 +2144,9 @@
           "taker",
           "takingAmount",
           "optionAttributes",
-          "makerAsset"
+          "makerAsset",
+          "takerIsSigner",
+          "orderTracking"
         ]
       },
       "MarketMakerQuoteRequestDto": {
@@ -2106,6 +2180,19 @@
             "description": "The address of the asset that the option is being purchased with",
             "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
           },
+          "takerIsSigner": {
+            "type": "boolean",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
+            "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
+          },
           "allowedSender": {
             "type": "string",
             "description": "The user who can submit the order to the chain. Zero address means anyone.",
@@ -2128,6 +2215,8 @@
           "takingAmount",
           "optionAttributes",
           "makerAsset",
+          "takerIsSigner",
+          "orderTracking",
           "allowedSender",
           "whitelist",
           "quoteRequestId"
@@ -2164,6 +2253,19 @@
             "description": "The address of the asset that the option is being purchased with",
             "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
           },
+          "takerIsSigner": {
+            "type": "boolean",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
+            "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
+          },
           "orderCreationTimestamp": {
             "type": "string",
             "description": "The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.",
@@ -2190,7 +2292,7 @@
             "example": "0x0000000000000000000000000000000000000000"
           },
           "signature": {
-            "type": "string",
+            "type": "object",
             "description": "To generate a signature from an order, the EIP712 standard can be used along with a private key. This is verified by Rolla when you send us a quote response after we request one.",
             "example": "0xba66d503dc4947f1a7d5e7d532f8e366b3e8db452607ea55a0c44d5b85097d9d03b1a12ee9b1347fad1968eefdae2977b8d82c7bf6e35ea871f5d0440ba88efa1c"
           },
@@ -2206,6 +2308,8 @@
           "takingAmount",
           "optionAttributes",
           "makerAsset",
+          "takerIsSigner",
+          "orderTracking",
           "orderCreationTimestamp",
           "maker",
           "makingAmount",
@@ -2235,7 +2339,10 @@
               "INVALID_MAKER",
               "INVALID_MAKING_AMOUNT",
               "NO_QUOTE_REQUEST_FOR_RESPONSE",
-              "DUPLICATED_QUOTE_RESPONSE"
+              "DUPLICATED_QUOTE_RESPONSE",
+              "UNKNOWN_ERROR",
+              "AUCTION_WINDOW_EXPIRED",
+              "QUOTE_REQUEST_EXPIRED"
             ]
           },
           "quoteRequestId": {
@@ -2249,50 +2356,77 @@
           "quoteRequestId"
         ]
       },
-      "ActiveOptionDto": {
+      "RawMarketMakerQuoteRequestDto": {
         "type": "object",
         "properties": {
-          "optionAddress": {
+          "orderExpirationTimestamp": {
             "type": "string",
-            "description": "Unique option identifier. Address of option smart contract on chain",
-            "example": "0xB8d42A81794Be0a3b6dC7E1C69303706C43C2796"
+            "description": "The timestamp when the order expires. If the block timestamp is after this timestamp when the order is submitted to the chain by the taker, the order will fail.",
+            "example": "1649071507"
           },
-          "collateralTokenId": {
+          "taker": {
             "type": "string",
-            "description": "The ID of the CollateralToken associated with the option",
-            "example": "2000000"
+            "description": "The address of the taker of the order (seller of options)",
+            "example": "0x0000000000000000000000000000000000000000"
+          },
+          "takingAmount": {
+            "type": "string",
+            "description": "The amount of options being sold in whole units - qTokens have 18 decimals",
+            "example": "1000000000000000000"
           },
           "optionAttributes": {
-            "description": "Attributes of options. Each field in this object is defined below.",
+            "description": "The attributes of the option to be sold adhering to struct format above",
             "allOf": [
               {
                 "$ref": "#/components/schemas/OptionAttributesDto"
               }
             ]
           },
-          "optionName": {
+          "makerAsset": {
             "type": "string",
-            "description": "Full name of the option token i.e. what the on-chain name function returns",
-            "example": "ROLLA WETH 01-April-2038 10000.90001 Put"
+            "description": "The address of the asset that the option is being purchased with",
+            "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
           },
-          "optionSymbol": {
-            "type": "string",
-            "description": "Symbol of the option token i.e. what the on-chain symbol function returns",
-            "example": "ROLLA-WETH-01APR2038-10000.90001-P"
-          },
-          "isOptionCreatedOnChain": {
+          "takerIsSigner": {
             "type": "boolean",
-            "description": "Whether or not the option exists or not. This doesn't have to be true for a taker to get a quote and take the quote as if it doesn't exist the option will be created on the fly when the quote is taken on chain.",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
             "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
+          },
+          "allowedSender": {
+            "type": "string",
+            "description": "The user who can submit the order to the chain. Zero address means anyone.",
+            "example": "0x0000000000000000000000000000000000000000"
+          },
+          "whitelist": {
+            "type": "string",
+            "description": "If the OrderProtocol contract is being called by a contract address and not directly by an EOA, the contract used to call the order protocol must be in the whitelist specified. If the whitelist is the zero address, any contract is allowed. Note, this doesnt prevent transitive calls i.e. contract B can call contract A which is whitelisted in whitelist and the order would succeed.",
+            "example": "0x0000000000000000000000000000000000000000"
+          },
+          "quoteRequestId": {
+            "type": "string",
+            "description": "The unique id of this quote request",
+            "example": "77a456e5-7c13-45fe-9dd1-0cd786b3e353"
           }
         },
         "required": [
-          "optionAddress",
-          "collateralTokenId",
+          "orderExpirationTimestamp",
+          "taker",
+          "takingAmount",
           "optionAttributes",
-          "optionName",
-          "optionSymbol",
-          "isOptionCreatedOnChain"
+          "makerAsset",
+          "takerIsSigner",
+          "orderTracking",
+          "allowedSender",
+          "whitelist",
+          "quoteRequestId"
         ]
       },
       "FeesDto": {
@@ -2382,11 +2516,12 @@
           "contractAddresses": {
             "description": "List of contract addresses",
             "example": {
-              "QuantProtocolMultisig": "0x43175993e186632431AFAe63eE0dcd9584e70f6e",
-              "QuantWebMultisig": "0x91Aa6d393Bb06cD8B4Ac3FEa24D1Bf44aCb780ac",
-              "AssetsRegistry": "0xd37D24c6a7E8D303724Bb1C532a22f16c1a7e850",
-              "OracleRegistry": "0x603B0C9Cd960c495bd82E197882Ea833A50ef819",
-              "PriceRegistry": "0x5299B53aBec02791ae45Ba19d1acBDd5305F5e80",
+              "startBlock": "25999341",
+              "QuantProtocolMultisig": "0x171415308c51F1B4513F2178772984E6581F706d",
+              "QuantWebMultisig": "0xe1B8294F90858e1f1d6C6A7B3666e3efCc6aC51b",
+              "AssetsRegistry": "0xa2b435D849575eAF85d188b9f0bC30e4bE00fB32",
+              "OracleRegistry": "0xe0E615b0D04849372d83Dbc7c51E5735ff0A1ee9",
+              "PriceRegistry": "0x5b1C934536F55A420fc996C6296dC70958E8E1D3",
               "tokens": {
                 "WETH": "0x5b99171e5a31233aF41f7c6Efa5c406A2CfAba59",
                 "WBNB": "0x19872A2ACc7c183A4d9B95a4cFE9c81e6765557E",
@@ -2394,19 +2529,19 @@
                 "USDC": "0x29630dA8A60c1FE60F9F2801d2B8236CDA66c33A"
               },
               "StrikeAsset": "0x29630dA8A60c1FE60F9F2801d2B8236CDA66c33A",
-              "ChainlinkOracleManager": "0x868743598fE796b1e42C302582c3e56a22444845",
-              "ChainlinkFixedTimeOracleManager": "0xc213317D5844479fD9deD11dbcd4d5A005FCC3a1",
-              "QToken": "0x5A9808b3cC55e9f30E26050388eac0386346db0F",
-              "Controller": "0xF0Ad4a0601691c5a0645c7A014f1e8C1C82D4a5b",
-              "OperateProxy": "0x8395BEa33559E547437AEbFE13cddB84f1196D42",
-              "CollateralToken": "0xb8A8155A51045c9498BDF6AF862FEE07ADcdB90D",
-              "OptionsFactory": "0x5889357be32999772Fe035afe527d5DC9228179E",
-              "QuantCalculator": "0xb4732A94b84e7C7aBE4B60e1559F95AF15760e8B",
-              "RollaOrderProtocol": "0x00868694d84A5F979f1199419A26863086F0BCb9",
-              "Whitelist": "0x59195B0503b3bEa59dCA7AE8b480Eaed8d0DfcA9",
-              "Multicall3": "0x8bDceBe916D2d449E792d4B2ED742BF908D727Ad",
-              "RollaFaucet": "0x3ac227a1EedFee8fc40583795281aA75521dE50f",
-              "TimelockController": "0x48Da4C0Fe3a010BeC5bcF94D3aaf350A37c8bDCa"
+              "ChainlinkOracleManager": "0x72D15800BA1195bb4Fc5DaF4CCA54eAa21D5e85b",
+              "ChainlinkFixedTimeOracleManager": "0x51f26459c2Df78c2E00a89CD6F880Cf93c80dA33",
+              "QToken": "0xC3550cc769d2b3538f088126c5B1a8f7d4fA5ec8",
+              "Controller": "0x2Adc68867410b3a46f1FaC3b02cd5E9d59BBAad1",
+              "OperateProxy": "0x7BE3B3d5e5D1A159d6E9E6739891Af6a1Fa65722",
+              "CollateralToken": "0x4307E15B34BB8841F388d2C26c0807ecCc11b47c",
+              "OptionsFactory": "0x4316DCD926EaF990Db6B65800BDE8ED03B8c681d",
+              "QuantCalculator": "0x90D495603b1f27363D0e721259dcFb77f6f6Af27",
+              "RollaOrderProtocol": "0xd4c1b7cdB03cbE1f780487d67CC26DB4564dFe9F",
+              "Whitelist": "0x96f223334415225937C8F008949DF5197704c444",
+              "Multicall3": "0x8AA5441bcD7aE90856bcFdf4DA210079Ac9A4fAC",
+              "RollaFaucet": "0xF73e3B3896b4a74A1e26b831CabF76c7121f342d",
+              "TimelockController": "0xa76aCb44523083925EB745321b0eEC0Cb557Ab9d"
             },
             "allOf": [
               {
@@ -2459,7 +2594,7 @@
             "description": "Options summary",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ActiveOptionDto"
+              "$ref": "#/components/schemas/OptionDto"
             }
           },
           "quotes": {
@@ -2506,6 +2641,11 @@
       "TradeDto": {
         "type": "object",
         "properties": {
+          "uniqueEventId": {
+            "type": "string",
+            "description": "Rolla unique event id used for paginating",
+            "example": "232412557808f5e8429852e62070417f86ead9aea8bc9bdf2826286d26786977"
+          },
           "optionAddress": {
             "type": "string",
             "description": "The address of the option token",
@@ -2588,6 +2728,7 @@
           }
         },
         "required": [
+          "uniqueEventId",
           "optionAddress",
           "collateralTokenId",
           "optionAttributes",
@@ -2636,6 +2777,19 @@
             "description": "The address of the asset that the option is being purchased with",
             "example": "0x1B86e5322A589f065bD40F0114664Ca40D78164B"
           },
+          "takerIsSigner": {
+            "type": "boolean",
+            "description": "Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.",
+            "example": true
+          },
+          "orderTracking": {
+            "description": "Order tracking object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderTrackingDto"
+              }
+            ]
+          },
           "orderCreationTimestamp": {
             "type": "string",
             "description": "The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.",
@@ -2668,36 +2822,13 @@
           "takingAmount",
           "optionAttributes",
           "makerAsset",
+          "takerIsSigner",
+          "orderTracking",
           "orderCreationTimestamp",
           "maker",
           "makingAmount",
           "allowedSender",
           "whitelist"
-        ]
-      },
-      "OrderTrackingDto": {
-        "type": "object",
-        "properties": {
-          "integrator": {
-            "type": "string",
-            "description": "Integrator Address",
-            "example": "0x974d7b7A72AE7BF1Ee2D7BdfA60FD51f1fc7702d"
-          },
-          "integratorPercentage": {
-            "type": "string",
-            "description": "Integrator commission percentage which will be sent to the integrator for referring the transaction",
-            "example": "500"
-          },
-          "orderTag": {
-            "type": "string",
-            "description": "An optional tracking parameter for applications",
-            "example": "0x0000000000000000000000000000000000000000000000000000000000000000"
-          }
-        },
-        "required": [
-          "integrator",
-          "integratorPercentage",
-          "orderTag"
         ]
       },
       "MetaTransactionDto": {
@@ -2724,7 +2855,7 @@
             "example": "0x1103ddf9398151e22c22c25866c1e24a71a1fae4"
           },
           "order": {
-            "description": "An optional tracking parameter for applications",
+            "description": "The order object",
             "allOf": [
               {
                 "$ref": "#/components/schemas/UnsignedQuoteDto"
@@ -2732,32 +2863,14 @@
             ]
           },
           "signature": {
-            "type": "string",
+            "type": "object",
             "description": "Signature of the order",
-            "example": "0x0000000000ee2848baf402a492bdfa3d596e00c170521cc6192b93864200c09c1a8488d1847e557b376d9c03325825cccf626c453d70c544055a57662f4ff2fc1c"
-          },
-          "makingAmount": {
-            "type": "string",
-            "description": "Making amount to transact (either this is provided or takingAmount, other should be 0)",
-            "example": "3000000"
-          },
-          "takingAmount": {
-            "type": "string",
-            "description": "Taking amount to transact (either this is provided or makingAmount, other should be 0)",
-            "example": "0"
+            "example": "{signatureType: SignatureType.EIP712, signatureData: \"0x0000000000ee2848baf402a492bdfa3d596e00c170521cc6192b93864200c09c1a8488d1847e557b376d9c03325825cccf626c453d70c544055a57662f4ff2fc1c\"}"
           },
           "permit": {
             "type": "string",
             "description": "Permit signature if an approval will be done with the meta transaction",
             "example": "0x00"
-          },
-          "orderTracking": {
-            "description": "Order tracking object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OrderTrackingDto"
-              }
-            ]
           }
         },
         "required": [
@@ -2767,10 +2880,7 @@
           "from",
           "order",
           "signature",
-          "makingAmount",
-          "takingAmount",
-          "permit",
-          "orderTracking"
+          "permit"
         ]
       },
       "SignedMetaTransactionDto": {
@@ -2785,9 +2895,9 @@
             ]
           },
           "signature": {
-            "type": "string",
+            "type": "object",
             "description": "Signature of meta transaction",
-            "example": "0x00000000005dfa902717946b4b4482bebd8a66073a53219e5b129b83b5d1cffa20ab5421bb07f2b0695127e1086165fa35e362c5b4b10b8c996e082f9ef46b481b"
+            "example": "{signatureType: SignatureType.EIP712, signatureData: \"0x0000000000ee2848baf402a492bdfa3d596e00c170521cc6192b93864200c09c1a8488d1847e557b376d9c03325825cccf626c453d70c544055a57662f4ff2fc1c\"}"
           }
         },
         "required": [
@@ -2830,7 +2940,7 @@
             "example": "ACCEPTED"
           },
           "orderSignature": {
-            "type": "string",
+            "type": "object",
             "description": "order signature"
           }
         },
@@ -2844,7 +2954,7 @@
         "type": "object",
         "properties": {
           "orderSignature": {
-            "type": "string"
+            "type": "object"
           },
           "status": {
             "type": "string",

@@ -34,9 +34,9 @@ export interface LastLookResponseWithOrderSignatureDto {
     'marketMakerAction': string;
     /**
      * order signature
-     * @type {string}
+     * @type {object}
      * @memberof LastLookResponseWithOrderSignatureDto
      */
-    'orderSignature': string;
+    'orderSignature': object;
 }
 
