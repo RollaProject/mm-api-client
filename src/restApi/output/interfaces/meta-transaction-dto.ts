@@ -16,9 +16,6 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { MetaTransactionDtoOrder } from './meta-transaction-dto-order';
-// May contain unused imports in some cases
-// @ts-ignore
-import { MetaTransactionDtoOrderTracking } from './meta-transaction-dto-order-tracking';
 
 /**
  * 
@@ -58,33 +55,15 @@ export interface MetaTransactionDto {
     'order': MetaTransactionDtoOrder;
     /**
      * Signature of the order
-     * @type {string}
+     * @type {object}
      * @memberof MetaTransactionDto
      */
-    'signature': string;
-    /**
-     * Making amount to transact (either this is provided or takingAmount, other should be 0)
-     * @type {string}
-     * @memberof MetaTransactionDto
-     */
-    'makingAmount': string;
-    /**
-     * Taking amount to transact (either this is provided or makingAmount, other should be 0)
-     * @type {string}
-     * @memberof MetaTransactionDto
-     */
-    'takingAmount': string;
+    'signature': object;
     /**
      * Permit signature if an approval will be done with the meta transaction
      * @type {string}
      * @memberof MetaTransactionDto
      */
     'permit': string;
-    /**
-     * 
-     * @type {MetaTransactionDtoOrderTracking}
-     * @memberof MetaTransactionDto
-     */
-    'orderTracking': MetaTransactionDtoOrderTracking;
 }
 

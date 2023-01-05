@@ -48,7 +48,10 @@ export const QuoteResponseReplyDtoValidityEnum = {
     InvalidMaker: 'INVALID_MAKER',
     InvalidMakingAmount: 'INVALID_MAKING_AMOUNT',
     NoQuoteRequestForResponse: 'NO_QUOTE_REQUEST_FOR_RESPONSE',
-    DuplicatedQuoteResponse: 'DUPLICATED_QUOTE_RESPONSE'
+    DuplicatedQuoteResponse: 'DUPLICATED_QUOTE_RESPONSE',
+    UnknownError: 'UNKNOWN_ERROR',
+    AuctionWindowExpired: 'AUCTION_WINDOW_EXPIRED',
+    QuoteRequestExpired: 'QUOTE_REQUEST_EXPIRED'
 } as const;
 
 export type QuoteResponseReplyDtoValidityEnum = typeof QuoteResponseReplyDtoValidityEnum[keyof typeof QuoteResponseReplyDtoValidityEnum];

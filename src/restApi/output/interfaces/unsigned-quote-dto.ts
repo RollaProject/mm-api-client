@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { QuoteDtoOptionAttributes } from './quote-dto-option-attributes';
+// May contain unused imports in some cases
+// @ts-ignore
+import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
 
 /**
  * 
@@ -53,6 +56,18 @@ export interface UnsignedQuoteDto {
      * @memberof UnsignedQuoteDto
      */
     'makerAsset': string;
+    /**
+     * Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.
+     * @type {boolean}
+     * @memberof UnsignedQuoteDto
+     */
+    'takerIsSigner': boolean;
+    /**
+     * 
+     * @type {QuoteDtoOrderTracking}
+     * @memberof UnsignedQuoteDto
+     */
+    'orderTracking': QuoteDtoOrderTracking;
     /**
      * The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.
      * @type {string}

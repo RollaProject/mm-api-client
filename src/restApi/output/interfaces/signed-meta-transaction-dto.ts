@@ -31,9 +31,9 @@ export interface SignedMetaTransactionDto {
     'metaTransaction': SignedMetaTransactionDtoMetaTransaction;
     /**
      * Signature of meta transaction
-     * @type {string}
+     * @type {object}
      * @memberof SignedMetaTransactionDto
      */
-    'signature': string;
+    'signature': object;
 }
 

@@ -17,6 +17,7 @@ it('sanity check for exported methods', () => {
         "Success": "SUCCESS",
       },
       "QuoteResponseReplyDtoValidityEnum": {
+        "AuctionWindowExpired": "AUCTION_WINDOW_EXPIRED",
         "DuplicatedQuoteResponse": "DUPLICATED_QUOTE_RESPONSE",
         "InsufficientAllowance": "INSUFFICIENT_ALLOWANCE",
         "InsufficientBalance": "INSUFFICIENT_BALANCE",
@@ -28,8 +29,10 @@ it('sanity check for exported methods', () => {
         "MarketMakerSkipped": "MARKET_MAKER_SKIPPED",
         "NoQuoteRequestForResponse": "NO_QUOTE_REQUEST_FOR_RESPONSE",
         "OtherFailure": "OTHER_FAILURE",
+        "QuoteRequestExpired": "QUOTE_REQUEST_EXPIRED",
         "RequestResponseMismatch": "REQUEST_RESPONSE_MISMATCH",
         "Timeout": "TIMEOUT",
+        "UnknownError": "UNKNOWN_ERROR",
         "ValidQuote": "VALID_QUOTE",
       },
       "RollaApiClient": [Function],

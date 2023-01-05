@@ -23,91 +23,67 @@ import { QuoteDtoOrderTracking } from './quote-dto-order-tracking';
 /**
  * 
  * @export
- * @interface MarketMakerQuoteResponseDto
+ * @interface RawMarketMakerQuoteRequestDto
  */
-export interface MarketMakerQuoteResponseDto {
+export interface RawMarketMakerQuoteRequestDto {
     /**
      * The timestamp when the order expires. If the block timestamp is after this timestamp when the order is submitted to the chain by the taker, the order will fail.
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'orderExpirationTimestamp': string;
     /**
      * The address of the taker of the order (seller of options)
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'taker': string;
     /**
      * The amount of options being sold in whole units - qTokens have 18 decimals
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'takingAmount': string;
     /**
      * 
      * @type {QuoteDtoOptionAttributes}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'optionAttributes': QuoteDtoOptionAttributes;
     /**
      * The address of the asset that the option is being purchased with
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'makerAsset': string;
     /**
      * Whether the taker is the signer of the order. If true, the taker is the signer of the order. If false, the maker is the signer of the order.
      * @type {boolean}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'takerIsSigner': boolean;
     /**
      * 
      * @type {QuoteDtoOrderTracking}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'orderTracking': QuoteDtoOrderTracking;
     /**
-     * The timestamp when the order was created. This is used for the cancel all functionality. When the on chain cancellation timestamp of the maker is after the orderCreationTimestamp, the order will fail.
-     * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
-     */
-    'orderCreationTimestamp': string;
-    /**
-     * The address of the maker of the order (signer of order, buyer of options)
-     * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
-     */
-    'maker': string;
-    /**
-     * The amount of makerAsset being offered in exchange for takingAmount
-     * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
-     */
-    'makingAmount': string;
-    /**
      * The user who can submit the order to the chain. Zero address means anyone.
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'allowedSender': string;
     /**
      * If the OrderProtocol contract is being called by a contract address and not directly by an EOA, the contract used to call the order protocol must be in the whitelist specified. If the whitelist is the zero address, any contract is allowed. Note, this doesnt prevent transitive calls i.e. contract B can call contract A which is whitelisted in whitelist and the order would succeed.
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'whitelist': string;
     /**
-     * To generate a signature from an order, the EIP712 standard can be used along with a private key. This is verified by Rolla when you send us a quote response after we request one.
-     * @type {object}
-     * @memberof MarketMakerQuoteResponseDto
-     */
-    'signature': object;
-    /**
-     * Associated quote request id
+     * The unique id of this quote request
      * @type {string}
-     * @memberof MarketMakerQuoteResponseDto
+     * @memberof RawMarketMakerQuoteRequestDto
      */
     'quoteRequestId': string;
 }

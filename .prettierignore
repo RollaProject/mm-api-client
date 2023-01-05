@@ -2,3 +2,5 @@
 package.json
 # the generated code has some ts-ignore comments that don't work if code is formatted
 src/restApi/output
+# Typechain files
+src/signing/typechain

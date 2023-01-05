@@ -751,6 +751,35 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRandomQuote: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/quotes/getRandomQuote`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Retrieves a list of recent trades
          * @param {any} [underlyingAddress] 
          * @param {'CALL' | 'PUT'} [optionType] 
@@ -887,7 +916,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Retrieves a list of a user\'s trades
-         * @param {string} userAddress 
+         * @param {any} userAddress 
          * @param {'maker' | 'taker' | 'all'} [includeTradeTypes] Filter trades by trade type
          * @param {string} [optionAddress] 
          * @param {string} [underlyingAddress] 
@@ -897,7 +926,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUserTrades: async (userAddress: string, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getUserTrades: async (userAddress: any, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userAddress' is not null or undefined
             assertParamExists('getUserTrades', 'userAddress', userAddress)
             const localVarPath = `/v1/trades`;
@@ -911,10 +940,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-            if (userAddress !== undefined) {
-                localVarQueryParameter['userAddress'] = userAddress;
-            }
 
             if (includeTradeTypes !== undefined) {
                 localVarQueryParameter['includeTradeTypes'] = includeTradeTypes;
@@ -938,6 +963,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (userAddress !== undefined) {
+                localVarQueryParameter['userAddress'] = userAddress;
             }
 
 
@@ -1053,6 +1082,39 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(marketMakerQuoteResponseDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setInternalConfig: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/config/internal`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1382,6 +1444,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRandomQuote(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRandomQuote(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Retrieves a list of recent trades
          * @param {any} [underlyingAddress] 
          * @param {'CALL' | 'PUT'} [optionType] 
@@ -1420,7 +1491,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Retrieves a list of a user\'s trades
-         * @param {string} userAddress 
+         * @param {any} userAddress 
          * @param {'maker' | 'taker' | 'all'} [includeTradeTypes] Filter trades by trade type
          * @param {string} [optionAddress] 
          * @param {string} [underlyingAddress] 
@@ -1430,7 +1501,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getUserTrades(userAddress: string, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TradeDto>>> {
+        async getUserTrades(userAddress: any, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TradeDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUserTrades(userAddress, includeTradeTypes, optionAddress, underlyingAddress, fromUniqueEventId, toUniqueEventId, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1464,6 +1535,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<QuoteResponseReplyDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.postQuoteResponses(marketMakerQuoteResponseDto, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setInternalConfig(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setInternalConfig(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1690,6 +1770,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRandomQuote(options?: any): AxiosPromise<void> {
+            return localVarFp.getRandomQuote(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Retrieves a list of recent trades
          * @param {any} [underlyingAddress] 
          * @param {'CALL' | 'PUT'} [optionType] 
@@ -1725,7 +1813,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Retrieves a list of a user\'s trades
-         * @param {string} userAddress 
+         * @param {any} userAddress 
          * @param {'maker' | 'taker' | 'all'} [includeTradeTypes] Filter trades by trade type
          * @param {string} [optionAddress] 
          * @param {string} [underlyingAddress] 
@@ -1735,7 +1823,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUserTrades(userAddress: string, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options?: any): AxiosPromise<Array<TradeDto>> {
+        getUserTrades(userAddress: any, includeTradeTypes?: 'maker' | 'taker' | 'all', optionAddress?: string, underlyingAddress?: string, fromUniqueEventId?: string, toUniqueEventId?: string, limit?: number, options?: any): AxiosPromise<Array<TradeDto>> {
             return localVarFp.getUserTrades(userAddress, includeTradeTypes, optionAddress, underlyingAddress, fromUniqueEventId, toUniqueEventId, limit, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1766,6 +1854,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         postQuoteResponses(marketMakerQuoteResponseDto: Array<MarketMakerQuoteResponseDto>, options?: any): AxiosPromise<Array<QuoteResponseReplyDto>> {
             return localVarFp.postQuoteResponses(marketMakerQuoteResponseDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setInternalConfig(options?: any): AxiosPromise<void> {
+            return localVarFp.setInternalConfig(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2060,10 +2156,10 @@ export interface DefaultApiGetUserPositionsRequest {
 export interface DefaultApiGetUserTradesRequest {
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof DefaultApiGetUserTrades
      */
-    readonly userAddress: string
+    readonly userAddress: any
 
     /**
      * Filter trades by trade type
@@ -2390,6 +2486,16 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getRandomQuote(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRandomQuote(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Retrieves a list of recent trades
      * @param {DefaultApiGetRecentTradesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -2469,6 +2575,16 @@ export class DefaultApi extends BaseAPI {
      */
     public postQuoteResponses(requestParameters: DefaultApiPostQuoteResponsesRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).postQuoteResponses(requestParameters.marketMakerQuoteResponseDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setInternalConfig(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setInternalConfig(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

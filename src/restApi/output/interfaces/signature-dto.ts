@@ -13,18 +13,24 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { MetaTransactionDto } from './meta-transaction-dto';
-// May contain unused imports in some cases
-// @ts-ignore
-import { MetaTransactionDtoOrder } from './meta-transaction-dto-order';
 
 /**
- * @type SignedMetaTransactionDtoMetaTransaction
- * Meta transaction to submit
+ * 
  * @export
+ * @interface SignatureDto
  */
-export type SignedMetaTransactionDtoMetaTransaction = MetaTransactionDto;
-
+export interface SignatureDto {
+    /**
+     * The signature data
+     * @type {string}
+     * @memberof SignatureDto
+     */
+    'signatureData': string;
+    /**
+     * The signature type
+     * @type {number}
+     * @memberof SignatureDto
+     */
+    'signatureType': number;
+}
 

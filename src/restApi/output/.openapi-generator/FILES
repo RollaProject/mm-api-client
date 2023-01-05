@@ -7,7 +7,6 @@ common.ts
 configuration.ts
 git_push.sh
 index.ts
-interfaces/active-option-dto.ts
 interfaces/asset-dto.ts
 interfaces/config-dto-contract-addresses.ts
 interfaces/config-dto-fees.ts
@@ -23,7 +22,6 @@ interfaces/maker-balance-dto.ts
 interfaces/maker-overview-dto.ts
 interfaces/market-maker-quote-request-dto.ts
 interfaces/market-maker-quote-response-dto.ts
-interfaces/meta-transaction-dto-order-tracking.ts
 interfaces/meta-transaction-dto-order.ts
 interfaces/meta-transaction-dto.ts
 interfaces/option-attributes-dto.ts
@@ -36,6 +34,7 @@ interfaces/post-meta-transaction-response-dto.ts
 interfaces/price-stored-dto.ts
 interfaces/prices-dto.ts
 interfaces/quote-dto-option-attributes.ts
+interfaces/quote-dto-order-tracking.ts
 interfaces/quote-dto.ts
 interfaces/quote-meta-data-dto.ts
 interfaces/quote-request-dto.ts
@@ -43,6 +42,7 @@ interfaces/quote-response-reply-dto.ts
 interfaces/quote-with-meta-data-dto-meta-data.ts
 interfaces/quote-with-meta-data-dto-quote.ts
 interfaces/quote-with-meta-data-dto.ts
+interfaces/raw-market-maker-quote-request-dto.ts
 interfaces/set-maker-active-dto.ts
 interfaces/signed-meta-transaction-dto-meta-transaction.ts
 interfaces/signed-meta-transaction-dto.ts

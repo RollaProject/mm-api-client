@@ -24,6 +24,12 @@ import { TradeDtoOptionAttributes } from './trade-dto-option-attributes';
  */
 export interface TradeDto {
     /**
+     * Rolla unique event id used for paginating
+     * @type {string}
+     * @memberof TradeDto
+     */
+    'uniqueEventId': string;
+    /**
      * The address of the option token
      * @type {string}
      * @memberof TradeDto
